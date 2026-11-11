@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ title }} | DreamGarage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black:    #0A0A0A;
+      --charcoal: #111111;
+      --panel:    #161616;
+      --border:   #2A2A2A;
+      --gold:     #C9A84C;
+      --gold-lt:  #E2C97E;
+      --white:    #F5F3EE;
+      --muted:    #888880;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:var(--black); color:var(--white);
+      font-family:'Rajdhani',sans-serif;
+      min-height:100vh; display:flex; flex-direction:column;
+    }
+    nav {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:24px 48px; border-bottom:1px solid var(--border);
+    }
+    .logo { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--white); text-decoration:none; }
+    .logo span { color:var(--gold); }
+    nav a.back { color:var(--gold); text-decoration:none; font-weight:600; letter-spacing:0.5px; }
+    main {
+      flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; padding:60px 24px;
+    }
+    .badge {
+      font-size:0.75rem; letter-spacing:3px; text-transform:uppercase;
+      color:var(--gold); border:1px solid var(--gold); border-radius:20px;
+      padding:6px 18px; margin-bottom:24px;
+    }
+    h1 { font-family:'Playfair Display',serif; font-size:2.6rem; margin-bottom:16px; }
+    p { color:var(--muted); max-width:480px; font-size:1.05rem; line-height:1.6; }
+    .home-btn {
+      margin-top:32px; display:inline-block; background:var(--gold); color:var(--black);
+      padding:12px 32px; border-radius:4px; text-decoration:none; font-weight:700;
+      letter-spacing:1px; text-transform:uppercase; font-size:0.85rem;
+    }
+
+    .content { max-width:760px; text-align:left; padding:50px 24px; margin:0 auto; flex:1; }
+    .content h1 { text-align:center; }
+    .content h2 { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.3rem; margin:28px 0 8px; }
+    .content p, .content li { color:var(--muted); max-width:none; font-size:1.05rem; line-height:1.7; }
+    .content ul { padding-left:22px; }
+    .content details { border:1px solid var(--border); padding:14px 18px; margin-bottom:10px; background:var(--panel); }
+    .content summary { cursor:pointer; color:var(--white); font-weight:600; }
+    .content details p { margin-top:10px; }
+    .content a { color:var(--gold); }
+    .content a.home-btn { color:var(--black); }
+    .center { text-align:center; margin-top:30px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="logo">Dream<span>Garage</span></a>
+    <a href="/" class="back">← Back to Home</a>
+  </nav>
+  <div class="content">
+    <h1>{{ title }}</h1>
+    {% if page == 'about' %}
+
+    <p>DreamGarage is a luxury car studio where you choose a car, design it your way — colour, wheels, interior and accessories — and order it online in a few clicks.</p>
+    <h2>What we do</h2>
+    <ul><li>Show you the finest cars from Ferrari, Rolls-Royce, Bentley, Lamborghini, Porsche, Mercedes and more.</li>
+    <li>Let you customise every detail and see the final price instantly.</li>
+    <li>Keep you updated until the car reaches your door.</li></ul>
+    <p>Ready to start? <a href="/cars">Browse our cars</a>.</p>
+    {% elif page == 'contact' %}
+
+    <p>We are happy to help with orders, customisation or delivery questions.</p>
+    <h2>Email</h2><p>support@dreamgarage.com</p>
+    <h2>Phone</h2><p>+91 98765 43210 (Mon–Sat, 10 AM – 7 PM)</p>
+    <h2>Head Office</h2><p>DreamGarage Studio, Mumbai, India</p>
+    <p>Already placed an order? <a href="/dashboard#tracking">See your order status</a>.</p>
+    {% elif page == 'faq' %}
+
+    <details><summary>How do I order a car?</summary><p>Create an account, pick a car from <a href="/cars">Cars</a>, customise it, enter delivery details and pay by UPI QR.</p></details>
+    <details><summary>Do I need an account to order?</summary><p>Yes. An account lets you see and track all your orders in My Orders.</p></details>
+    <details><summary>How do I track my order?</summary><p>Log in and open <a href="/dashboard#tracking">My Orders</a> to see the live status of every order.</p></details>
+    <details><summary>What do the order statuses mean?</summary><p>Pending (waiting for confirmation) → Confirmed → Production → Shipped → Delivered.</p></details>
+    <details><summary>Is GST included?</summary><p>Yes. The total shown on the order page includes 28% GST.</p></details>
+    {% elif page == 'privacy-policy' %}
+
+    <p>We respect your privacy. This page explains what we keep and why.</p>
+    <h2>What we store</h2><p>Your name, email, phone, city, delivery address and order details — only to create your account and deliver your car.</p>
+    <h2>Passwords</h2><p>Passwords are stored in encrypted (hashed) form. We cannot read them.</p>
+    <h2>Sharing</h2><p>We do not sell your data. We share delivery details only with the people who deliver your order.</p>
+    <h2>Questions</h2><p>Write to support@dreamgarage.com.</p>
+    {% elif page == 'terms' %}
+
+    <p>By using DreamGarage you agree to these simple terms.</p>
+    <h2>Orders</h2><p>An order is confirmed only after our team verifies your payment. Until then it shows as Pending.</p>
+    <h2>Prices</h2><p>Prices include customisation and 28% GST. Prices may change before an order is confirmed.</p>
+    <h2>Your account</h2><p>Keep your password safe. You are responsible for activity on your account.</p>
+    <h2>Delivery</h2><p>Delivery time depends on the car and customisation chosen and will be shared by our team.</p>
+    {% elif page == 'showrooms' %}
+
+    <p>Visit us to see the cars in person. Please call before visiting.</p>
+    <h2>Mumbai</h2><p>Bandra Kurla Complex, Mumbai</p>
+    <h2>Delhi</h2><p>Aerocity, New Delhi</p>
+    <h2>Bangalore</h2><p>UB City, Bangalore</p>
+    <h2>Chennai</h2><p>Nungambakkam, Chennai</p>
+    {% endif %}
+    <div class="center"><a href="/" class="home-btn">Return Home</a></div>
+  </div>
+</body>
+</html>

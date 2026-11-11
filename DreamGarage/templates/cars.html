@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cars | DreamGarage</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  body { padding-top: 80px; background: var(--black); }
+
+  .cars-hero { text-align: center; padding: 56px 20px 34px; }
+  .cars-hero .eyebrow { font-size: 0.68rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .cars-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 300; margin-bottom: 10px; }
+  .cars-hero p { color: var(--muted); font-size: 0.95rem; }
+
+  .cars-wrap { max-width: 1200px; margin: 0 auto; padding: 0 30px 90px; }
+
+  /* search + filters : one row, all the same height */
+  .cars-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px; margin-bottom: 30px; background: var(--charcoal); border: 1px solid var(--border); }
+  .cars-toolbar input, .cars-toolbar select {
+    height: 46px; padding: 0 14px; background: var(--panel); border: 1px solid var(--border); color: var(--white);
+    font: 400 0.88rem 'Inter', sans-serif; outline: none; border-radius: 0;
+  }
+  .cars-toolbar input { flex: 1 1 260px; min-width: 0; }
+  .cars-toolbar select { flex: 0 0 180px; cursor: pointer; }
+  .cars-toolbar input:focus, .cars-toolbar select:focus { border-color: var(--gold); }
+  .cars-toolbar input::placeholder { color: #666; }
+  .cars-count { margin-left: auto; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+
+  /* grid of cards : every card and every photo has the same size */
+  .cc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 26px; }
+  .cc-card { display: flex; flex-direction: column; background: var(--charcoal); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.25s, transform 0.25s; }
+  .cc-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .cc-img { position: relative; aspect-ratio: 3 / 2; background: var(--panel); overflow: hidden; }
+  .cc-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cc-tag { position: absolute; top: 12px; left: 12px; padding: 4px 10px; background: var(--gold); color: var(--black); font-size: 0.62rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .cc-body { display: flex; flex-direction: column; flex: 1; padding: 20px 22px 22px; }
+  .cc-brand { margin-bottom: 6px; font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+  .cc-name { margin-bottom: 6px; font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 600; line-height: 1.2; }
+  .cc-spec { font-size: 0.8rem; color: var(--muted); }
+  .cc-rate { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 16px 0 18px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); }
+  .cc-rate .stars { color: var(--gold); }
+  .cc-rate button { background: none; border: none; padding: 0; color: var(--gold); font: inherit; cursor: pointer; text-decoration: underline; }
+  .cc-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; }
+  .cc-price small { display: block; font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .cc-price strong { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 600; color: var(--gold); }
+  .cc-btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 22px; background: var(--gold); color: var(--black); font-size: 0.74rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: background 0.2s; }
+  .cc-btn:hover { background: var(--gold-lt); }
+  .cars-empty { grid-column: 1 / -1; padding: 60px 0; text-align: center; color: var(--muted); }
+
+  @media (max-width: 640px) {
+    .cars-wrap { padding: 0 16px 70px; }
+    .cars-toolbar select { flex: 1 1 140px; }
+    .cars-count { margin-left: 0; width: 100%; }
+    .cc-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<style>
+  #reviewModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:300; align-items:center; justify-content:center; padding:20px; }
+  #reviewModal.show { display:flex; }
+  .rv-box { background:var(--surface,#111); border:1px solid var(--border); max-width:560px; width:100%; max-height:88vh; overflow-y:auto; padding:26px; position:relative; }
+  .rv-close { position:absolute; top:10px; right:14px; background:none; border:none; color:var(--muted); font-size:26px; cursor:pointer; }
+  .rv-box h2 { font-family:var(--font-display, serif); color:var(--white); margin-bottom:4px; }
+  .rv-summary { color:var(--gold); margin-bottom:18px; font-size:14px; }
+  .rv-item { border-top:1px solid var(--border); padding:12px 0; }
+  .rv-item .rv-top { display:flex; justify-content:space-between; font-size:13px; color:var(--white); }
+  .rv-item .rv-stars { color:var(--gold); letter-spacing:2px; }
+  .rv-item p { color:var(--muted); font-size:14px; margin-top:6px; line-height:1.5; word-break:break-word; }
+  .rv-item small { color:var(--text-faint,#555); }
+  .rv-del { background:none; border:none; color:#e74c3c; cursor:pointer; font-size:12px; margin-left:10px; }
+  .rv-form { border-top:1px solid var(--border); margin-top:14px; padding-top:16px; }
+  .rv-form h3 { color:var(--white); font-size:15px; margin-bottom:10px; }
+  .star-pick { font-size:30px; color:#444; cursor:pointer; letter-spacing:4px; user-select:none; }
+  .star-pick span.on { color:var(--gold); }
+  .rv-form textarea { width:100%; min-height:80px; margin:10px 0; padding:10px; background:var(--surface2,#1a1a1a); border:1px solid var(--border); color:var(--white); font-family:inherit; resize:vertical; }
+  .rv-submit { background:var(--gold); color:#000; border:none; padding:10px 24px; font-weight:700; letter-spacing:1px; cursor:pointer; }
+  #rvMsg { margin-left:12px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<nav id="navbar" class="scrolled">
+  <a href="/" class="logo">Dream<span>Garage</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/cars" style="color:var(--white)">Models</a></li>
+    <li><a href="/customize">Customize</a></li>
+    <li><a href="/#how-it-works">How It Works</a></li>
+    <li><a href="/dashboard">My Orders</a></li>
+    {% if current_user_name %}<li><a href="/logout" class="nav-cta">Sign Out</a></li>{% else %}<li><a href="/login" class="nav-cta">Sign In</a></li>{% endif %}
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<section class="cars-hero">
+  <div class="eyebrow">Our Collection</div>
+  <h1>Luxury Car Collection</h1>
+  <p>Choose your dream car, then customize it your way.</p>
+</section>
+
+<main class="cars-wrap">
+  <div class="cars-toolbar">
+    <input type="text" id="searchBox" placeholder="Search by brand or model..." autocomplete="off">
+    <select id="brandFilter">
+      <option value="">All Brands</option>
+      {% for b in brands %}<option value="{{ b|lower }}">{{ b }}</option>{% endfor %}
+    </select>
+    <select id="categoryFilter">
+      <option value="">All Types</option>
+      {% for t in categories %}<option value="{{ t|lower }}">{{ t }}</option>{% endfor %}
+    </select>
+    <span class="cars-count" id="carCount"></span>
+  </div>
+
+  <div class="cc-grid" id="carGrid">
+    {% for car in cars %}
+    <article class="cc-card" data-brand="{{ car.brand|lower }}" data-category="{{ car.category|lower }}" data-text="{{ (car.brand ~ ' ' ~ car.name ~ ' ' ~ car.category)|lower }}">
+      <div class="cc-img">
+        {% if car.image %}<img src="{{ url_for('static', filename='images/' ~ car.image) }}" alt="{{ car.brand }} {{ car.name }}" loading="lazy">{% endif %}
+        <span class="cc-tag">{{ car.category }}</span>
+      </div>
+      <div class="cc-body">
+        <div class="cc-brand">{{ car.brand }}</div>
+        <h3 class="cc-name">{{ car.name }}</h3>
+        <div class="cc-spec">{{ car.spec }}{% if car.bhp %} &middot; {{ car.bhp }} HP{% endif %}</div>
+        <div class="cc-rate">
+          {% if car.review_count %}<span><span class="stars">&#9733;</span> {{ car.avg_rating }} ({{ car.review_count }} review{{ 's' if car.review_count != 1 }})</span>
+          {% else %}<span>No reviews yet</span>{% endif %}
+          <button type="button" onclick="openReviews({{ car.id }})">Reviews</button>
+        </div>
+        <div class="cc-foot">
+          <div class="cc-price"><small>Starting from</small><strong>&#8377;{{ car.base_price|inr }}</strong></div>
+          <a href="/customize?car={{ car.id }}" class="cc-btn">Customize</a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <p class="cars-empty">No cars available right now.</p>
+    {% endfor %}
+    <p class="cars-empty" id="noMatch" style="display:none">No cars match your search.</p>
+  </div>
+</main>
+
+<div id="reviewModal" onclick="if(event.target===this) closeReviews()">
+  <div class="rv-box">
+    <button class="rv-close" onclick="closeReviews()">×</button>
+    <h2 id="rvTitle">Reviews</h2>
+    <div class="rv-summary" id="rvSummary"></div>
+    <div id="rvList"></div>
+
+    <div class="rv-form" id="rvForm">
+      <h3>Write your review</h3>
+      <div class="star-pick" id="starPick">
+        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+      </div>
+      <textarea id="rvComment" maxlength="500" placeholder="Share your thoughts about this car..."></textarea>
+      <button class="rv-submit" onclick="submitReview()">SUBMIT REVIEW</button>
+      <span id="rvMsg"></span>
+    </div>
+    <p id="rvLogin" style="display:none;color:var(--muted);border-top:1px solid var(--border);padding-top:16px;margin-top:14px">
+      <a href="/login?next=/cars" style="color:var(--gold)">Log in</a> to write a review.
+    </p>
+  </div>
+</div>
+
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="/" class="logo">Dream<span>Garage</span></a>
+      <p>India's premier bespoke luxury car customization and ordering platform.</p>
+    </div>
+    <div class="footer-col"><h4>Navigate</h4><ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/cars">Models</a></li>
+      <li><a href="/customize">Customize</a></li>
+      <li><a href="/dashboard">My Orders</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Account</h4><ul>
+      <li><a href="/login">Sign In</a></li>
+      <li><a href="/register">Register</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Support</h4><ul>
+      <li><a href="/contact">Contact</a></li>
+      <li><a href="/faq">FAQ</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; {{ year }} DreamGarage. All rights reserved.</p>
+    <p style="color:var(--border);font-size:0.72rem;">HTML · CSS · JS · Python · SQLite</p>
+  </div>
+</footer>
+
+<script>
+  // Navbar
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  // Search + brand + type filters (work on the cars already on the page)
+  const searchBox = document.getElementById('searchBox');
+  const brandFilter = document.getElementById('brandFilter');
+  const categoryFilter = document.getElementById('categoryFilter');
+
+  function filterCars() {
+    const q = searchBox.value.trim().toLowerCase();
+    let shown = 0;
+    document.querySelectorAll('#carGrid .cc-card').forEach(card => {
+      const ok = card.dataset.text.includes(q)
+        && (!brandFilter.value || card.dataset.brand === brandFilter.value)
+        && (!categoryFilter.value || card.dataset.category === categoryFilter.value);
+      card.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    document.getElementById('noMatch').style.display = shown ? 'none' : 'block';
+    document.getElementById('carCount').textContent = shown + (shown === 1 ? ' car' : ' cars');
+  }
+  searchBox.addEventListener('input', filterCars);
+  brandFilter.addEventListener('change', filterCars);
+  categoryFilter.addEventListener('change', filterCars);
+
+  // links like /cars?category=suv or /cars?brand=porsche
+  const params = new URLSearchParams(location.search);
+  if (params.get('category')) categoryFilter.value = params.get('category').toLowerCase();
+  if (params.get('brand')) brandFilter.value = params.get('brand').toLowerCase();
+  filterCars();
+
+  // ---------- Reviews popup ----------
+  let reviewCarId = null, pickedStars = 0;
+  const carNames = {{ cars|map(attribute='name')|list|tojson }};
+  const carIds   = {{ cars|map(attribute='id')|list|tojson }};
+
+  function setStars(n) {
+    pickedStars = n;
+    document.querySelectorAll('#starPick span').forEach(sp => sp.classList.toggle('on', Number(sp.dataset.v) <= n));
+  }
+  document.querySelectorAll('#starPick span').forEach(sp => sp.addEventListener('click', () => setStars(Number(sp.dataset.v))));
+
+  async function openReviews(carId) {
+    reviewCarId = carId;
+    setStars(0);
+    document.getElementById('rvComment').value = '';
+    document.getElementById('rvMsg').textContent = '';
+    document.getElementById('rvTitle').textContent = 'Reviews - ' + carNames[carIds.indexOf(carId)];
+    document.getElementById('reviewModal').classList.add('show');
+    await loadReviews();
+  }
+
+  function closeReviews() {
+    document.getElementById('reviewModal').classList.remove('show');
+  }
+
+  async function loadReviews() {
+    const res = await fetch('/api/cars/' + reviewCarId + '/reviews');
+    const data = await res.json();
+
+    document.getElementById('rvSummary').textContent = data.count
+      ? '★ ' + data.average + ' / 5  (' + data.count + ' review' + (data.count > 1 ? 's' : '') + ')'
+      : 'No reviews yet. Be the first to review this car!';
+
+    const list = document.getElementById('rvList');
+    list.innerHTML = '';
+    data.reviews.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'rv-item';
+
+      const top = document.createElement('div');
+      top.className = 'rv-top';
+      const who = document.createElement('span');
+      who.textContent = r.name;
+      const stars = document.createElement('span');
+      stars.className = 'rv-stars';
+      stars.textContent = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+      top.append(who, stars);
+
+      const text = document.createElement('p');
+      text.textContent = r.comment;               // textContent keeps it safe from HTML injection
+
+      const small = document.createElement('small');
+      small.textContent = r.date;
+      if (r.can_delete) {
+        const del = document.createElement('button');
+        del.className = 'rv-del';
+        del.textContent = 'Delete';
+        del.onclick = () => deleteReview(r.id);
+        small.append(del);
+      }
+      item.append(top, text, small);
+      list.append(item);
+    });
+
+    document.getElementById('rvForm').style.display = data.logged_in ? 'block' : 'none';
+    document.getElementById('rvLogin').style.display = data.logged_in ? 'none' : 'block';
+  }
+
+  async function submitReview() {
+    const msg = document.getElementById('rvMsg');
+    const res = await fetch('/api/cars/' + reviewCarId + '/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: pickedStars, comment: document.getElementById('rvComment').value })
+    });
+    const data = await res.json();
+    msg.style.color = data.success ? '#2ecc71' : '#e74c3c';
+    msg.textContent = data.message;
+    if (data.success) {
+      setTimeout(() => location.reload(), 900);    // reload so the card shows the new rating
+    }
+  }
+
+  async function deleteReview(id) {
+    if (!confirm('Delete this review?')) return;
+    await fetch('/api/reviews/' + id, { method: 'DELETE' });
+    location.reload();
+  }
+</script>
+
+</body>
+</html>

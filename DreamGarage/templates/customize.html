@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customize | DreamGarage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    body { padding-top: 80px; background: var(--black); }
+
+    .config-page { max-width: 1200px; margin: 0 auto; padding: 40px 30px 100px; }
+
+    .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 34px; flex-wrap: wrap; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 300; }
+    .page-header h1 em { font-style: italic; color: var(--gold); }
+
+    .car-picker { display: flex; align-items: center; gap: 10px; }
+    .car-picker label { font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .car-picker select {
+      background: var(--panel); border: 1px solid var(--border); color: var(--white);
+      padding: 10px 14px; font-size: 0.85rem; font-family: 'Inter', sans-serif; outline: none; cursor: pointer;
+      min-width: 220px;
+    }
+    .car-picker select:focus { border-color: var(--gold); }
+
+    .config-layout { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: start; }
+
+    /* ===== LEFT ===== */
+    .config-left { display: flex; flex-direction: column; gap: 24px; }
+
+    .preview-card { background: var(--charcoal); border: 1px solid var(--border); overflow: hidden; }
+    .preview-frame { position: relative; width: 100%; aspect-ratio: 3/2; background: var(--panel); overflow: hidden; }
+    .preview-frame img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.35s ease; }
+    .preview-tint {
+      position: absolute; inset: 0; mix-blend-mode: color; opacity: 0.38; transition: background 0.35s ease; pointer-events: none;
+    }
+    .preview-badge {
+      position: absolute; top: 16px; left: 16px; background: var(--gold); color: var(--black);
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 12px;
+    }
+    .preview-info { padding: 24px 28px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .preview-brand { font-size: 0.68rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+    .preview-name { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; font-weight: 600; }
+    .preview-spec { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+    .preview-base { text-align: right; }
+    .preview-base span { font-size: 0.72rem; color: var(--muted); display: block; }
+    .preview-base strong { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); }
+
+    .option-card { background: var(--charcoal); border: 1px solid var(--border); padding: 28px; }
+    .option-card h3 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin-bottom: 4px;
+    }
+    .option-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
+
+    /* Color swatches */
+    .swatch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 18px; }
+    .swatch-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+    .swatch-circle {
+      width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--border);
+      transition: all 0.2s; box-shadow: inset 0 0 0 3px var(--black);
+    }
+    .swatch-item.selected .swatch-circle { border-color: var(--gold); transform: scale(1.08); }
+    .swatch-name { font-size: 0.72rem; text-align: center; color: var(--white); line-height: 1.3; }
+    .swatch-price { font-size: 0.68rem; color: var(--muted); }
+    .swatch-item.selected .swatch-price { color: var(--gold); }
+
+    /* Pill choice cards (wheels / interior) */
+    .pill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .pill-card {
+      border: 1px solid var(--border); background: var(--panel); padding: 16px 16px; cursor: pointer;
+      transition: all 0.2s; text-align: left;
+    }
+    .pill-card:hover { border-color: #555; }
+    .pill-card.selected { border-color: var(--gold); background: var(--gold-dim, rgba(201,168,76,0.1)); }
+    .pill-name { font-size: 0.86rem; font-weight: 500; margin-bottom: 4px; }
+    .pill-price { font-size: 0.72rem; color: var(--muted); }
+    .pill-card.selected .pill-price { color: var(--gold); }
+
+    /* Accessories checkboxes */
+    .check-list { display: flex; flex-direction: column; gap: 10px; }
+    .check-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      border: 1px solid var(--border); background: var(--panel); padding: 14px 16px; cursor: pointer; transition: border-color 0.2s;
+    }
+    .check-item:hover { border-color: #555; }
+    .check-item.selected { border-color: var(--gold); }
+    .check-left { display: flex; align-items: center; gap: 12px; }
+    .check-box {
+      width: 18px; height: 18px; border: 1px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .check-item.selected .check-box { background: var(--gold); border-color: var(--gold); }
+    .check-item.selected .check-box::after { content: '✓'; font-size: 0.7rem; color: var(--black); font-weight: 700; }
+    .check-name { font-size: 0.86rem; }
+    .check-price { font-size: 0.78rem; color: var(--muted); }
+    .check-item.selected .check-price { color: var(--gold); }
+
+    /* ===== RIGHT: sticky summary ===== */
+    .config-right { position: sticky; top: 90px; }
+    .price-card { background: var(--charcoal); border: 1px solid var(--border); }
+    .price-card-header { padding: 24px 28px; border-bottom: 1px solid var(--border); }
+    .price-card-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
+    .price-card-body { padding: 20px 28px; }
+    .price-line { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #1e1e1e; gap: 12px; }
+    .price-line:last-child { border-bottom: none; }
+    .price-line span:first-child { font-size: 0.8rem; color: var(--muted); }
+    .price-line span:last-child { font-size: 0.84rem; color: var(--white); text-align: right; }
+    .price-total-block { padding: 20px 28px; background: var(--panel); border-top: 1px solid var(--border); }
+    .total-label { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .total-value { font-family: 'Cormorant Garamond', serif; font-size: 2.1rem; color: var(--gold); }
+    .order-cta { padding: 22px 28px; border-top: 1px solid var(--border); }
+    .btn-proceed {
+      width: 100%; padding: 16px; font-size: 0.84rem; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;
+      background: var(--gold); color: var(--black); border: none; transition: background 0.2s;
+    }
+    .btn-proceed:hover { background: var(--gold-lt); }
+    .btn-proceed:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .loading-state, .empty-state { text-align: center; padding: 100px 20px; color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .config-layout { grid-template-columns: 1fr; }
+      .config-right { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="scrolled">
+  <a href="/" class="logo">Dream<span>Garage</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/cars">Models</a></li>
+    <li><a href="/customize" style="color:var(--white)">Customize</a></li>
+    <li><a href="/#how-it-works">How It Works</a></li>
+    <li><a href="/dashboard">My Orders</a></li>
+    {% if current_user_name %}<li><a href="/logout" class="nav-cta">Sign Out</a></li>{% else %}<li><a href="/login" class="nav-cta">Sign In</a></li>{% endif %}
+  </ul>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="config-page">
+  <div class="page-header">
+    <div>
+      <div class="section-eyebrow">Bespoke Configurator</div>
+      <h1>Build your <em>masterpiece</em></h1>
+    </div>
+    <div class="car-picker">
+      <label for="carSelect">Vehicle</label>
+      <select id="carSelect"></select>
+    </div>
+  </div>
+
+  <div id="loadingState" class="loading-state">Loading configurator…</div>
+
+  <div class="config-layout" id="configLayout" style="display:none">
+
+    <!-- LEFT -->
+    <div class="config-left">
+
+      <!-- Preview -->
+      <div class="preview-card">
+        <div class="preview-frame">
+          <span class="preview-badge" id="pvBadge">Sport</span>
+          <img id="pvImage" src="" alt="">
+          <div class="preview-tint" id="pvTint"></div>
+        </div>
+        <div class="preview-info">
+          <div>
+            <div class="preview-brand" id="pvBrand">—</div>
+            <div class="preview-name" id="pvName">—</div>
+            <div class="preview-spec" id="pvSpec">—</div>
+          </div>
+          <div class="preview-base">
+            <span>Base Price</span>
+            <strong id="pvBase">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Color -->
+      <div class="option-card">
+        <h3>Exterior Color</h3>
+        <div class="option-sub">Choose your finish. Preview shows an approximate tint.</div>
+        <div class="swatch-grid" id="colorGrid"></div>
+      </div>
+
+      <!-- Wheels -->
+      <div class="option-card">
+        <h3>Wheels</h3>
+        <div class="option-sub">Select a wheel package.</div>
+        <div class="pill-grid" id="wheelsGrid"></div>
+      </div>
+
+      <!-- Interior -->
+      <div class="option-card">
+        <h3>Interior</h3>
+        <div class="option-sub">Choose your cabin trim.</div>
+        <div class="pill-grid" id="interiorGrid"></div>
+      </div>
+
+      <!-- Accessories -->
+      <div class="option-card">
+        <h3>Accessories</h3>
+        <div class="option-sub">Add any extras (optional, multiple allowed).</div>
+        <div class="check-list" id="accessoriesList"></div>
+      </div>
+
+    </div><!-- /config-left -->
+
+    <!-- RIGHT -->
+    <div class="config-right">
+      <div class="price-card">
+        <div class="price-card-header"><h3>Your Configuration</h3></div>
+        <div class="price-card-body">
+          <div class="price-line"><span>Base Price</span><span id="sumBase">—</span></div>
+          <div class="price-line"><span>Color</span><span id="sumColor">—</span></div>
+          <div class="price-line"><span>Wheels</span><span id="sumWheels">—</span></div>
+          <div class="price-line"><span>Interior</span><span id="sumInterior">—</span></div>
+          <div class="price-line"><span>Accessories</span><span id="sumExtras">₹0</span></div>
+        </div>
+        <div class="price-total-block">
+          <div class="total-label">Estimated Total</div>
+          <div class="total-value" id="sumTotal">—</div>
+        </div>
+        <div class="order-cta">
+          <button class="btn-proceed" id="proceedBtn">Proceed to Order</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /config-layout -->
+
+  <div class="empty-state" id="emptyState" style="display:none">No vehicles are available to configure right now.</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="/" class="logo">Dream<span>Garage</span></a>
+      <p>India's premier bespoke luxury car customization and ordering platform.</p>
+    </div>
+    <div class="footer-col"><h4>Navigate</h4><ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/cars">Models</a></li>
+      <li><a href="/customize">Customize</a></li>
+      <li><a href="/dashboard">My Orders</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Account</h4><ul>
+      <li><a href="/login">Sign In</a></li>
+      <li><a href="/register">Register</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Support</h4><ul>
+      <li><a href="/contact">Contact</a></li>
+      <li><a href="/faq">FAQ</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {{ year }} DreamGarage. All rights reserved.</p>
+    <p style="color:var(--border);font-size:0.72rem;">HTML · CSS · JS · Python · SQLite</p>
+  </div>
+</footer>
+
+<script>
+  // Navbar
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+  });
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  const fmtINR = n => Math.round(n).toLocaleString('en-IN');
+  function fmtPrice(n) { return `₹${fmtINR(Number(n))}`; }      // exact amount, Indian style
+
+  let cars = [];
+  let optionsByCategory = { color: [], wheels: [], interior: [], accessories: [] };
+  let currentCar = null;
+  let selected = { color: null, wheels: null, interior: null, extras: new Set() };
+
+  async function init() {
+    try {
+      const [carsRes, optsRes] = await Promise.all([
+        fetch('/api/cars'),
+        fetch('/api/customization-options')
+      ]);
+      cars = await carsRes.json();
+      const opts = await optsRes.json();
+      opts.forEach(o => {
+        if (!optionsByCategory[o.category]) optionsByCategory[o.category] = [];
+        optionsByCategory[o.category].push(o);
+      });
+    } catch (e) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('emptyState').textContent = 'Could not load the configurator. Please try again.';
+      return;
+    }
+
+    if (!cars.length) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+      return;
+    }
+
+    populateCarPicker();
+    const car = resolveCarFromUrl();
+    selectCar(car.id);
+
+    document.getElementById('carSelect').addEventListener('change', e => {
+      selectCar(Number(e.target.value));
+      history.replaceState(null, '', `?car=${e.target.value}`);
+    });
+
+    document.getElementById('proceedBtn').addEventListener('click', proceedToOrder);
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('configLayout').style.display = 'grid';
+  }
+
+  function resolveCarFromUrl() {
+    const id = Number(new URLSearchParams(location.search).get('car'));
+    return cars.find(car => car.id === id) || cars[0];      // /customize?car=3 opens car 3
+  }
+
+  function populateCarPicker() {
+    const sel = document.getElementById('carSelect');
+    sel.innerHTML = cars.map(c => `<option value="${c.id}">${c.brand} ${c.name}</option>`).join('');
+  }
+
+  function selectCar(carId) {
+    currentCar = cars.find(c => c.id === carId) || cars[0];
+    document.getElementById('carSelect').value = currentCar.id;
+
+    // Reset selections to defaults (cheapest / first option) for the new car
+    selected.color    = defaultOption('color');
+    selected.wheels    = defaultOption('wheels');
+    selected.interior  = defaultOption('interior');
+    selected.extras    = new Set();
+
+    renderPreview();
+    renderColorGrid();
+    renderPillGrid('wheels', 'wheelsGrid');
+    renderPillGrid('interior', 'interiorGrid');
+    renderAccessories();
+    updateSummary();
+  }
+
+  function defaultOption(category) {
+    const list = optionsByCategory[category] || [];
+    if (!list.length) return null;
+    return list.find(o => Number(o.extra_price) === 0) || list[0];
+  }
+
+  function renderPreview() {
+    document.getElementById('pvBrand').textContent = currentCar.brand;
+    document.getElementById('pvName').textContent = currentCar.name;
+    document.getElementById('pvSpec').textContent = currentCar.spec || '';
+    document.getElementById('pvBase').textContent = fmtPrice(currentCar.base_price);
+    document.getElementById('pvBadge').textContent = currentCar.category || '';
+
+    const img = document.getElementById('pvImage');
+    const src = currentCar.image ? `/static/images/${currentCar.image}` : '';
+    img.src = src;
+    img.alt = `${currentCar.brand} ${currentCar.name}`;
+    img.onerror = () => { img.style.display = 'none'; };
+    img.onload = () => { img.style.display = 'block'; };
+
+    updateTint();
+  }
+
+  function updateTint() {
+    const tint = document.getElementById('pvTint');
+    tint.style.background = selected.color?.hex_code || 'transparent';
+  }
+
+  function renderColorGrid() {
+    const grid = document.getElementById('colorGrid');
+    grid.innerHTML = '';
+    (optionsByCategory.color || []).forEach(opt => {
+      const div = document.createElement('div');
+      div.className = 'swatch-item' + (selected.color?.id === opt.id ? ' selected' : '');
+      div.innerHTML = `
+        <div class="swatch-circle" style="background:${opt.hex_code || '#333'}"></div>
+        <div class="swatch-name">${opt.name}</div>
+        <div class="swatch-price">${Number(opt.extra_price) ? '+' + fmtPrice(opt.extra_price) : 'Included'}</div>
+      `;
+      div.addEventListener('click', () => {
+        selected.color = opt;
+        renderColorGrid();
+        updateTint();
+        updateSummary();
+      });
+      grid.appendChild(div);
+    });
+  }
+
+  function renderPillGrid(category, gridId) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    (optionsByCategory[category] || []).forEach(opt => {
+      const div = document.createElement('div');
+      const isSel = selected[category]?.id === opt.id;
+      div.className = 'pill-card' + (isSel ? ' selected' : '');
+      div.innerHTML = `
+        <div class="pill-name">${opt.name}</div>
+        <div class="pill-price">${Number(opt.extra_price) ? '+' + fmtPrice(opt.extra_price) : 'Included'}</div>
+      `;
+      div.addEventListener('click', () => {
+        selected[category] = opt;
+        renderPillGrid(category, gridId);
+        updateSummary();
+      });
+      grid.appendChild(div);
+    });
+  }
+
+  function renderAccessories() {
+    const list = document.getElementById('accessoriesList');
+    list.innerHTML = '';
+    (optionsByCategory.accessories || []).forEach(opt => {
+      const div = document.createElement('div');
+      const isSel = selected.extras.has(opt.id);
+      div.className = 'check-item' + (isSel ? ' selected' : '');
+      div.innerHTML = `
+        <div class="check-left">
+          <div class="check-box"></div>
+          <div class="check-name">${opt.name}</div>
+        </div>
+        <div class="check-price">+${fmtPrice(opt.extra_price)}</div>
+      `;
+      div.addEventListener('click', () => {
+        if (selected.extras.has(opt.id)) selected.extras.delete(opt.id);
+        else selected.extras.add(opt.id);
+        renderAccessories();
+        updateSummary();
+      });
+      list.appendChild(div);
+    });
+  }
+
+  function updateSummary() {
+    const base = currentCar.base_price;
+    const colorP = selected.color ? Number(selected.color.extra_price) : 0;
+    const wheelsP = selected.wheels ? Number(selected.wheels.extra_price) : 0;
+    const interiorP = selected.interior ? Number(selected.interior.extra_price) : 0;
+    const extrasList = (optionsByCategory.accessories || []).filter(o => selected.extras.has(o.id));
+    const extrasP = extrasList.reduce((s, o) => s + Number(o.extra_price), 0);
+    const total = base + colorP + wheelsP + interiorP + extrasP;
+
+    document.getElementById('sumBase').textContent = fmtPrice(base);
+    document.getElementById('sumColor').textContent = `${selected.color?.name ?? '—'}${colorP ? ' (+' + fmtPrice(colorP) + ')' : ''}`;
+    document.getElementById('sumWheels').textContent = `${selected.wheels?.name ?? '—'}${wheelsP ? ' (+' + fmtPrice(wheelsP) + ')' : ''}`;
+    document.getElementById('sumInterior').textContent = `${selected.interior?.name ?? '—'}${interiorP ? ' (+' + fmtPrice(interiorP) + ')' : ''}`;
+    document.getElementById('sumExtras').textContent = extrasList.length ? fmtPrice(extrasP) : '₹0';
+    document.getElementById('sumTotal').textContent = fmtPrice(total);
+  }
+
+  function proceedToOrder() {
+    const extrasList = (optionsByCategory.accessories || [])
+      .filter(o => selected.extras.has(o.id))
+      .map(o => ({ name: o.name, price: Number(o.extra_price) }));
+
+    const cfg = {
+      carId: currentCar.id,
+      carName: `${currentCar.brand} ${currentCar.name}`,
+      basePrice: currentCar.base_price,
+      color: selected.color ? { name: selected.color.name, price: Number(selected.color.extra_price), hex: selected.color.hex_code } : null,
+      wheels: selected.wheels ? { name: selected.wheels.name, price: Number(selected.wheels.extra_price) } : null,
+      interior: selected.interior ? { name: selected.interior.name, price: Number(selected.interior.extra_price) } : null,
+      engine: { name: currentCar.spec || '', price: 0 },
+      extras: extrasList
+    };
+
+    sessionStorage.setItem('dreamgarage_config', JSON.stringify(cfg));
+    window.location.href = '/order';
+  }
+
+  init();
+</script>
+
+</body>
+</html>

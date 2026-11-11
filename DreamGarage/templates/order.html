@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Summary | DreamGarage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    body { padding-top: 80px; background: var(--black); }
+
+    .order-page { max-width: 1100px; margin: 0 auto; padding: 60px 30px 100px; }
+
+    .page-header { margin-bottom: 50px; }
+    .page-header .section-eyebrow { margin-bottom: 10px; }
+    .page-header h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; }
+
+    .order-layout { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
+
+    /* ===== LEFT ===== */
+    .order-left { display: flex; flex-direction: column; gap: 24px; }
+
+    .order-card {
+      background: var(--charcoal); border: 1px solid var(--border); padding: 30px;
+    }
+    .order-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; margin-bottom: 20px;
+      padding-bottom: 14px; border-bottom: 1px solid var(--border);
+    }
+
+    /* Config Summary */
+    .config-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+    }
+    .config-row:last-child { border-bottom: none; }
+    .config-key { font-size: 0.8rem; color: var(--muted); }
+    .config-val { font-size: 0.88rem; color: var(--white); font-weight: 500; }
+    .config-price { font-size: 0.8rem; color: var(--gold); }
+
+    /* Delivery Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 0; }
+    .form-group.full { grid-column: 1/-1; }
+    .form-group label { display: block; font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: var(--panel); border: 1px solid var(--border);
+      color: var(--white); padding: 12px 14px; font-size: 0.88rem;
+      font-family: 'Inter', sans-serif; outline: none;
+      transition: border-color 0.2s; resize: none;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #333; }
+    .form-group select option { background: var(--charcoal); }
+
+    /* Payment */
+    .payment-methods { display: flex; flex-direction: column; gap: 12px; }
+    .payment-option {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border: 1px solid var(--border);
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .payment-option:hover, .payment-option.selected { border-color: var(--gold); }
+    .payment-radio {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .payment-option.selected .payment-radio { border-color: var(--gold); background: var(--gold); }
+    .payment-option.selected .payment-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--black); }
+    .payment-icon { font-size: 1.2rem; width: 30px; }
+    .payment-label { font-size: 0.88rem; font-weight: 500; }
+    .payment-sub   { font-size: 0.74rem; color: var(--muted); }
+
+    /* ===== RIGHT: Price Summary ===== */
+    .order-right { position: sticky; top: 90px; }
+
+    .price-card { background: var(--charcoal); border: 1px solid var(--border); }
+    .price-card-header { padding: 24px 28px; border-bottom: 1px solid var(--border); }
+    .price-card-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
+
+    .price-card-body { padding: 24px 28px; }
+    .price-line { display: flex; justify-content: space-between; padding: 9px 0; }
+    .price-line:not(:last-child) { border-bottom: 1px solid #1e1e1e; }
+    .price-line span:first-child { font-size: 0.8rem; color: var(--muted); }
+    .price-line span:last-child  { font-size: 0.84rem; color: var(--white); }
+
+    .price-total-block {
+      padding: 20px 28px; background: var(--panel); border-top: 1px solid var(--border);
+    }
+    .total-label { font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .total-value { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: var(--gold); }
+    .total-sub   { font-size: 0.74rem; color: var(--muted); margin-top: 4px; }
+
+    .order-cta { padding: 24px 28px; border-top: 1px solid var(--border); }
+    .btn-order { width: 100%; padding: 16px; font-size: 0.84rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; background: var(--gold); color: var(--black); border: none; transition: background 0.2s; }
+    .btn-order:hover { background: var(--gold-lt); }
+
+    .security-note { margin-top: 14px; font-size: 0.74rem; color: var(--muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    /* DELIVERY TIMELINE */
+    .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+    .timeline-item { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0; margin-top: 5px;
+    }
+    .timeline-line {
+      position: absolute; left: 4px; top: 15px; bottom: 0;
+      width: 1px; background: var(--border);
+    }
+    .timeline-item:last-child .timeline-line { display: none; }
+    .timeline-label { font-size: 0.82rem; font-weight: 500; margin-bottom: 2px; }
+    .timeline-sub   { font-size: 0.74rem; color: var(--muted); }
+
+    /* Order Success Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--charcoal); border: 1px solid var(--border);
+      padding: 60px 50px; text-align: center; max-width: 480px; width: 90%;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .modal-overlay.show .modal { transform: translateY(0); }
+    .modal-icon { font-size: 3rem; margin-bottom: 20px; }
+    .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 10px; }
+    .modal p  { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 30px; }
+    .modal-order-id { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); margin-bottom: 28px; }
+
+    @media (max-width: 860px) {
+      .order-layout { grid-template-columns: 1fr; }
+      .order-right { position: static; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="scrolled">
+  <a href="/" class="logo">Dream<span>Garage</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/cars">Models</a></li>
+    <li><a href="/customize">Customize</a></li>
+    <li><a href="/dashboard">My Orders</a></li>
+    {% if current_user_name %}<li><a href="/logout" class="nav-cta">Sign Out</a></li>{% else %}<li><a href="/login" class="nav-cta">Sign In</a></li>{% endif %}
+  </ul>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- QR PAYMENT MODAL -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-icon">📱</div>
+    <h2>Scan & Pay</h2>
+    <p style="margin-bottom:16px">Demo payment screen — no real payment is processed.</p>
+
+    <!-- Amount -->
+    <div style="background:var(--panel);border:1px solid var(--border);padding:14px;margin-bottom:20px">
+      <div style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Amount to Pay</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold)" id="qrAmount">₹0</div>
+    </div>
+
+    <!-- QR Code Image -->
+    <div style="background:white;padding:16px;display:inline-block;margin-bottom:20px">
+      <div role="img" aria-label="Demo QR placeholder" style="width:200px;height:200px;display:flex;align-items:center;justify-content:center;background:#f3f0e8;color:#222;font-weight:700;text-align:center;padding:18px;box-sizing:border-box">DEMO ONLY<br>NO PAYMENT</div>
+    </div>
+
+    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:24px">
+      For portfolio demonstration only. Do not make a real payment.
+    </p>
+
+    <!-- Buttons -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button class="btn-primary" style="width:100%;padding:14px;border:none;cursor:pointer;font-size:0.82rem;letter-spacing:2px"
+              id="paidBtn" onclick="confirmPayment()">
+        ✅ I Have Paid — Confirm Order
+      </button>
+      <button onclick="document.getElementById('qrModal').classList.remove('show')"
+              style="background:none;border:1px solid var(--border);color:var(--muted);padding:12px;cursor:pointer;font-size:0.78rem;font-family:Inter,sans-serif">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-icon">🏆</div>
+    <h2>Order Placed!</h2>
+    <p>Thank you! Your order is placed and is waiting for payment verification. You can follow its status in My Orders.</p>
+    <div class="modal-order-id" id="modalOrderId">Order #</div>
+    <a href="/dashboard" class="btn-primary" style="display:inline-block">View My Orders</a>
+  </div>
+</div>
+
+<div class="order-page">
+  <div class="page-header fade-up">
+    <div class="section-eyebrow">Final Step</div>
+    <h1>Review & Place Order</h1>
+  </div>
+
+  <div class="order-layout">
+
+    <!-- LEFT -->
+    <div class="order-left">
+
+      <!-- Configuration Summary -->
+      <div class="order-card fade-up">
+        <h3>Your Configuration</h3>
+        <div class="config-row">
+          <span class="config-key">Vehicle</span>
+          <div style="text-align:right"><span class="config-val" id="cfgVehicle">—</span></div>
+        </div>
+        <div class="config-row">
+          <span class="config-key">Exterior Color</span>
+          <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+            <span class="config-val" id="cfgColor">—</span>
+            <div id="cfgColorDot" style="width:14px;height:14px;border-radius:50%;background:transparent;border:1px solid #333;flex-shrink:0"></div>
+          </div>
+        </div>
+        <div class="config-row">
+          <span class="config-key">Wheels</span>
+          <span class="config-val" id="cfgWheels">—</span>
+        </div>
+        <div class="config-row">
+          <span class="config-key">Interior</span>
+          <span class="config-val" id="cfgInterior">—</span>
+        </div>
+        <div class="config-row">
+          <span class="config-key">Engine / Spec</span>
+          <span class="config-val" id="cfgEngine">—</span>
+        </div>
+        <div class="config-row">
+          <span class="config-key">Extras</span>
+          <span class="config-val" id="cfgExtras">None</span>
+        </div>
+        <div style="margin-top:16px">
+          <a href="/customize" style="font-size:0.78rem;color:var(--gold);text-decoration:none;">← Edit Configuration</a>
+        </div>
+      </div>
+
+      <!-- Delivery Details -->
+      <div class="order-card fade-up">
+        <h3>Delivery Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="delName" placeholder="Arjun Mehta"/>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="delPhone" placeholder="+91 98765 43210"/>
+          </div>
+          <div class="form-group full">
+            <label>Delivery Address</label>
+            <input type="text" id="delAddress" placeholder="House/Flat No., Street, Area"/>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <select id="delCity">
+              <option>Mumbai</option><option>Delhi</option>
+              <option>Bangalore</option><option>Chennai</option>
+              <option>Hyderabad</option><option>Pune</option>
+              <option>Kolkata</option><option>Madurai</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code</label>
+            <input type="text" id="delPin" placeholder="600001" maxlength="6"/>
+          </div>
+          <div class="form-group full">
+            <label>Special Instructions (Optional)</label>
+            <textarea id="delNotes" rows="2" placeholder="Delivery time preference, gate code, etc."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div class="order-card fade-up">
+        <h3>Payment</h3>
+        <div class="payment-methods">
+          <div class="payment-option selected">
+            <div class="payment-radio"></div>
+            <div class="payment-icon">📱</div>
+            <div><div class="payment-label">UPI QR Code</div><div class="payment-sub">Scan with GPay, PhonePe, Paytm or any UPI app in the next step</div></div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem;color:var(--muted);margin-top:14px;line-height:1.6">
+          Your order stays <strong style="color:var(--gold)">Pending</strong> until our team verifies the payment. You can follow the status in My Orders.
+        </p>
+      </div>
+
+      <!-- Delivery Timeline -->
+      <div class="order-card fade-up">
+        <h3>Delivery Timeline</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+            <div><div class="timeline-label">Order Confirmed</div><div class="timeline-sub">Immediately after payment</div></div>
+          </div>
+          <div class="timeline-item">
+            <div><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+            <div><div class="timeline-label">Production Begins</div><div class="timeline-sub">Within 3–5 business days</div></div>
+          </div>
+          <div class="timeline-item">
+            <div><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+            <div><div class="timeline-label">Quality Inspection</div><div class="timeline-sub">Approx. 8–12 weeks</div></div>
+          </div>
+          <div class="timeline-item">
+            <div><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+            <div><div class="timeline-label">White-Glove Delivery</div><div class="timeline-sub">To your doorstep — tracked every step</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /order-left -->
+
+    <!-- RIGHT -->
+    <div class="order-right">
+      <div class="price-card">
+        <div class="price-card-header"><h3>Price Summary</h3></div>
+        <div class="price-card-body">
+          <div class="price-line"><span>Base Price</span><span id="sumBase">₹2,40,00,000</span></div>
+          <div class="price-line"><span>Color Upgrade</span><span id="sumColor">Included</span></div>
+          <div class="price-line"><span>Wheels</span><span id="sumWheels">Included</span></div>
+          <div class="price-line"><span>Interior</span><span id="sumInterior">Included</span></div>
+          <div class="price-line"><span>Extras</span><span id="sumExtras">₹0</span></div>
+          <div class="price-line"><span>GST (28%)</span><span id="sumGst">—</span></div>
+        </div>
+        <div class="price-total-block">
+          <div class="total-label">Total (incl. GST)</div>
+          <div class="total-value" id="sumTotal">—</div>
+          <div class="total-sub">All prices in Indian Rupees</div>
+        </div>
+        <div class="order-cta">
+          <button class="btn-order" id="placeOrderBtn">Confirm & Place Order</button>
+          <div class="security-note">You will pay by UPI QR code in the next step</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="/" class="logo">Dream<span>Garage</span></a>
+      <p>India's premier bespoke luxury car customization and ordering platform.</p>
+    </div>
+    <div class="footer-col"><h4>Quick Links</h4><ul>
+      <li><a href="/cars">Models</a></li>
+      <li><a href="/customize">Customize</a></li>
+      <li><a href="/dashboard">My Orders</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {{ year }} DreamGarage. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // Navbar
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+  });
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  const LOGGED_IN = {{ 'true' if current_user_name else 'false' }};
+
+  // Load config from sessionStorage
+  const raw = sessionStorage.getItem('dreamgarage_config');
+  const cfg = raw ? JSON.parse(raw) : null;
+
+  // No car chosen yet -> go and choose one
+  if (!cfg) { window.location.href = '/customize'; }
+
+  const base = cfg?.basePrice ?? 0;
+  const colorP    = cfg?.color?.price    ?? 0;
+  const wheelsP   = cfg?.wheels?.price   ?? 0;
+  const interiorP = cfg?.interior?.price ?? 0;
+  const engineP   = cfg?.engine?.price   ?? 0;
+  const extrasTotal = cfg?.extras?.reduce((s, e) => s + e.price, 0) ?? 0;
+  const subtotal  = base + colorP + wheelsP + interiorP + engineP + extrasTotal;
+  const gst       = Math.round(subtotal * 0.28);
+  const total     = subtotal + gst;
+
+  // Fill config display
+  if (cfg) {
+    document.getElementById('cfgVehicle').textContent  = cfg.carName        ?? '—';
+    document.getElementById('cfgColor').textContent    = cfg.color?.name    ?? '—';
+    document.getElementById('cfgColorDot').style.background = cfg.color?.hex || 'transparent';
+    document.getElementById('cfgWheels').textContent   = cfg.wheels?.name   ?? '—';
+    document.getElementById('cfgInterior').textContent = cfg.interior?.name ?? '—';
+    document.getElementById('cfgEngine').textContent   = cfg.engine?.name   ?? '—';
+    document.getElementById('cfgExtras').textContent   = cfg.extras?.length ? cfg.extras.map(e => e.name).join(', ') : 'None';
+  }
+
+  // Fill price summary
+  document.getElementById('sumBase').textContent     = `₹${fmt(base)}`;
+  document.getElementById('sumColor').textContent    = colorP    ? `+₹${fmt(colorP)}`    : 'Included';
+  document.getElementById('sumWheels').textContent   = wheelsP   ? `+₹${fmt(wheelsP)}`   : 'Included';
+  document.getElementById('sumInterior').textContent = interiorP ? `+₹${fmt(interiorP)}` : 'Included';
+  document.getElementById('sumExtras').textContent   = extrasTotal ? `+₹${fmt(extrasTotal)}` : '₹0';
+  document.getElementById('sumGst').textContent      = `₹${fmt(gst)}`;
+  document.getElementById('sumTotal').textContent    = `₹${fmt(total)}`;
+
+  function fmt(n) { return n.toLocaleString('en-IN'); }
+
+
+  // Place Order — Show QR first
+  document.getElementById('placeOrderBtn').addEventListener('click', () => {
+    const name    = document.getElementById('delName').value.trim();
+    const phone   = document.getElementById('delPhone').value.trim();
+    const address = document.getElementById('delAddress').value.trim();
+    const pin     = document.getElementById('delPin').value.trim();
+
+    if (!name || !phone || !address || !pin) {
+      alert('Please fill in all delivery details before placing the order.');
+      return;
+    }
+    if (!/^[+0-9 ()-]{10,15}$/.test(phone)) {
+      alert('Please enter a valid phone number.');
+      return;
+    }
+    if (!/^[0-9]{6}$/.test(pin)) {
+      alert('PIN code must be 6 digits.');
+      return;
+    }
+    if (!LOGGED_IN) {
+      alert('Please sign in first. Your car configuration will be kept.');
+      window.location.href = '/login?next=/order';
+      return;
+    }
+
+    // Show QR modal with amount
+    document.getElementById('qrAmount').textContent =
+      `₹${fmt(total)}`;
+    document.getElementById('qrModal').classList.add('show');
+  });
+
+  // After user pays — confirm order
+  async function confirmPayment() {
+    const btn = document.getElementById('paidBtn');
+    btn.textContent = 'Confirming…';
+    btn.disabled = true;
+
+    const name    = document.getElementById('delName').value.trim();
+    const phone   = document.getElementById('delPhone').value.trim();
+    const address = document.getElementById('delAddress').value.trim();
+    const city    = document.getElementById('delCity').value;
+    const pin     = document.getElementById('delPin').value.trim();
+    const notes   = document.getElementById('delNotes').value.trim();
+
+    const orderData = {
+      config:   cfg,
+      delivery: { name, phone, address, city, pin, notes },
+      payment:  'upi_qr',
+      total
+    };
+
+    try {
+      const res  = await fetch('/place_order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+      const data = await res.json();
+      document.getElementById('qrModal').classList.remove('show');
+
+      if (res.status === 401) {
+        window.location.href = '/login?next=/order';
+        return;
+      }
+      if (data.success) {
+        showModal(data.order_id);
+      } else {
+        alert(data.message || 'Could not place the order. Please try again.');
+      }
+    } catch {
+      alert('Cannot reach the server. Is app.py running?');
+    }
+
+    btn.textContent = '✅ I Have Paid — Confirm Order';
+    btn.disabled = false;
+  }
+
+  function showModal(orderId) {
+    document.getElementById('modalOrderId').textContent = `Order #${orderId}`;
+    document.getElementById('modalOverlay').classList.add('show');
+    sessionStorage.removeItem('dreamgarage_config');
+  }
+</script>
+
+</body>
+</html>

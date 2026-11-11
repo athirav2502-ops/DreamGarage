@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel | DreamGarage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    body { padding-top: 70px; }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 70px);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: #0d0d0d;
+      border-right: 1px solid var(--border);
+      padding: 30px 0;
+      position: sticky; top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+    }
+
+    .admin-brand {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .admin-brand-title {
+      font-size: 0.65rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 4px;
+    }
+    .admin-brand-name {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.3rem;
+    }
+
+    .sidebar-menu { list-style: none; padding: 0 12px; }
+    .sidebar-menu li { margin-bottom: 2px; }
+    .sidebar-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; text-decoration: none; color: var(--muted);
+      font-size: 0.82rem; letter-spacing: 0.5px;
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .sidebar-menu a:hover  { color: var(--white); background: rgba(255,255,255,0.04); }
+    .sidebar-menu a.active { color: var(--gold);  background: rgba(201,168,76,0.08); }
+    .sidebar-menu .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .sidebar-divider { height: 1px; background: var(--border); margin: 14px 24px; }
+
+    .sidebar-logout {
+      margin: 8px 12px 0; display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; color: var(--danger); font-size: 0.82rem;
+      cursor: pointer; background: none; border: none;
+      font-family: 'Inter', sans-serif; width: calc(100% - 24px); text-align: left;
+    }
+
+    /* ===== MAIN ===== */
+    .admin-main { background: var(--black); padding: 40px 44px; overflow-y: auto; }
+
+    .admin-header { margin-bottom: 32px; }
+    .admin-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; }
+    .admin-header h1 span { color: var(--gold); }
+    .admin-header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+    /* STAT CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+    .stat-card {
+      background: var(--charcoal); border: 1px solid var(--border);
+      padding: 22px 24px;
+    }
+    .stat-card-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .stat-card-value { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: var(--white); line-height: 1; }
+    .stat-card-sub   { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+    .stat-card.gold  .stat-card-value { color: var(--gold); }
+    .stat-card.green .stat-card-value { color: #27AE60; }
+    .stat-card.red   .stat-card-value { color: #C0392B; }
+
+    /* SECTION */
+    .admin-section { margin-bottom: 44px; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px;
+    }
+    .section-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; }
+
+    /* TABS */
+    .tab-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .tab-btn {
+      padding: 12px 20px; font-size: 0.72rem; letter-spacing: 2px;
+      text-transform: uppercase; background: none; border: none;
+      color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+      font-family: 'Inter', sans-serif; transition: all 0.2s;
+    }
+    .tab-btn:hover  { color: var(--white); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* TABLE */
+    .admin-table { width: 100%; border-collapse: collapse; }
+    .admin-table thead tr { border-bottom: 1px solid var(--border); }
+    .admin-table th {
+      text-align: left; padding: 10px 14px;
+      font-size: 0.63rem; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--muted); font-weight: 400;
+    }
+    .admin-table tbody tr {
+      border-bottom: 1px solid #1a1a1a; transition: background 0.15s;
+    }
+    .admin-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .admin-table td { padding: 14px; font-size: 0.82rem; vertical-align: middle; }
+
+    .order-ref  { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--gold); }
+    .user-name  { font-weight: 500; }
+    .user-email { font-size: 0.74rem; color: var(--muted); }
+
+    /* STATUS BADGE */
+    .status-badge {
+      display: inline-block; padding: 4px 10px;
+      font-size: 0.63rem; letter-spacing: 1.5px;
+      text-transform: uppercase; font-weight: 600;
+    }
+    .status-pending    { background: rgba(241,196,15,0.15);  color: #F1C40F; }
+    .status-confirmed  { background: rgba(52,152,219,0.15);  color: #3498DB; }
+    .status-production { background: rgba(230,126,34,0.15);  color: #E67E22; }
+    .status-shipped    { background: rgba(155,89,182,0.15);  color: #9B59B6; }
+    .status-delivered  { background: rgba(39,174,96,0.15);   color: #27AE60; }
+
+    /* STATUS UPDATE DROPDOWN */
+    .status-select {
+      background: var(--panel); border: 1px solid var(--border);
+      color: var(--white); padding: 6px 10px; font-size: 0.75rem;
+      font-family: 'Inter', sans-serif; outline: none; cursor: pointer;
+    }
+    .status-select:focus { border-color: var(--gold); }
+
+    .update-btn {
+      background: var(--gold); color: var(--black);
+      border: none; padding: 7px 14px; font-size: 0.72rem;
+      font-weight: 600; cursor: pointer; letter-spacing: 1px;
+      font-family: 'Inter', sans-serif; transition: background 0.2s;
+    }
+    .update-btn:hover { background: var(--gold-lt); }
+
+    /* SEARCH BAR */
+    .search-bar {
+      display: flex; gap: 12px; margin-bottom: 20px;
+    }
+    .search-input {
+      flex: 1; background: var(--charcoal); border: 1px solid var(--border);
+      color: var(--white); padding: 10px 16px; font-size: 0.85rem;
+      font-family: 'Inter', sans-serif; outline: none;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .search-input::placeholder { color: #333; }
+
+    /* USER ROLE BADGE */
+    .role-badge {
+      display: inline-block; padding: 3px 10px;
+      font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .role-customer { background: rgba(201,168,76,0.12); color: var(--gold); }
+    .role-admin    { background: rgba(192,57,43,0.15);  color: #e74c3c; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: var(--charcoal); border: 1px solid var(--gold);
+      color: var(--white); padding: 14px 24px;
+      font-size: 0.84rem; z-index: 999;
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* REVENUE CARD */
+    .revenue-card {
+      background: linear-gradient(135deg, #1a1200, #0d0d0d);
+      border: 1px solid var(--gold);
+      padding: 28px 32px; margin-bottom: 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .revenue-label { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+    .revenue-value { font-family: 'Cormorant Garamond', serif; font-size: 3rem; color: var(--white); }
+    .revenue-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+    @media (max-width: 900px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; height: auto; }
+      .admin-main { padding: 24px 16px; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="scrolled">
+  <a href="/" class="logo">Dream<span>Garage</span> <span style="font-size:0.6rem;color:var(--danger);letter-spacing:2px;vertical-align:middle">ADMIN</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">View Site</a></li>
+    <li><a href="/logout" class="nav-cta">Sign Out</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="admin-brand">
+      <div class="admin-brand-title">Admin Panel</div>
+      <div class="admin-brand-name">DreamGarage</div>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li><a href="#" class="active" onclick="showTab('dashboard')"><span class="icon">📊</span>Dashboard</a></li>
+      <li><a href="#" onclick="showTab('orders')"><span class="icon">📋</span>All Orders</a></li>
+      <li><a href="#" onclick="showTab('users')"><span class="icon">👥</span>All Users</a></li>
+      <li><a href="#" onclick="showTab('cars')"><span class="icon">🚗</span>Manage Cars</a></li>
+    </ul>
+
+    <div class="sidebar-divider"></div>
+
+    <ul class="sidebar-menu">
+      <li><a href="/"><span class="icon">🌐</span>View Website</a></li>
+    </ul>
+
+    <button class="sidebar-logout" onclick="window.location.href='/logout'">
+      <span class="icon">🚪</span> Sign Out
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <!-- ===== DASHBOARD TAB ===== -->
+    <div class="tab-content active" id="tab-dashboard">
+
+      <div class="admin-header">
+        <h1>Admin <span>Dashboard</span></h1>
+        <p>Welcome back! Here's your DreamGarage overview.</p>
+      </div>
+
+      <!-- Revenue Banner -->
+      <div class="revenue-card">
+        <div>
+          <div class="revenue-label">Total Revenue</div>
+          <div class="revenue-value">₹{{ stats.revenue|inr }}</div>
+          <div class="revenue-sub">From confirmed + delivered orders</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:2rem">💰</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card gold">
+          <div class="stat-card-label">Total Orders</div>
+          <div class="stat-card-value">{{ stats.orders }}</div>
+          <div class="stat-card-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Total Users</div>
+          <div class="stat-card-value">{{ stats.users }}</div>
+          <div class="stat-card-sub">Registered customers</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-card-label">Delivered</div>
+          <div class="stat-card-value">{{ stats.delivered }}</div>
+          <div class="stat-card-sub">Successfully delivered</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-card-label">Pending</div>
+          <div class="stat-card-value">{{ stats.pending }}</div>
+          <div class="stat-card-sub">Awaiting confirmation</div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="admin-section">
+        <div class="section-header">
+          <h2>Recent Orders</h2>
+          <a href="#" onclick="showTab('orders')" style="font-size:0.78rem;color:var(--gold);text-decoration:none">View all →</a>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Vehicle</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersBody">
+            {% for o in orders[:5] %}
+            <tr data-order="{{ o.id }}">
+              <td><span class="order-ref">{{ o.ref }}</span></td>
+              <td><span class="user-name">{{ o.user_name }}</span><br><span class="user-email">{{ o.user_email }}</span></td>
+              <td>{{ o.brand }} {{ o.car_name }}</td>
+              <td>₹{{ o.total_price|inr }}</td>
+              <td><span class="status-badge status-{{ o.status|lower }}">{{ o.status }}</span></td>
+              <td>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <select class="status-select" id="sel-{{ o.id }}">{% for st in statuses %}<option value="{{ st|lower }}" {% if st == o.status %}selected{% endif %}>{{ st }}</option>{% endfor %}</select>
+                  <button class="update-btn" onclick="updateStatus({{ o.id }}, 'sel-{{ o.id }}', this)">Update</button>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" style="color:var(--muted)">No orders yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ===== ORDERS TAB ===== -->
+    <div class="tab-content" id="tab-orders">
+      <div class="admin-header">
+        <h1>All <span>Orders</span></h1>
+        <p>Manage and update all customer orders.</p>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" class="search-input" id="orderSearch" placeholder="Search by Order ID or customer name…" oninput="filterOrders()"/>
+      </div>
+
+      <!-- Status Filter Tabs -->
+      <div class="tab-bar" style="margin-bottom:20px">
+        <button class="tab-btn active" onclick="filterByStatus('all',this)">All</button>
+        <button class="tab-btn" onclick="filterByStatus('pending',this)">Pending</button>
+        <button class="tab-btn" onclick="filterByStatus('confirmed',this)">Confirmed</button>
+        <button class="tab-btn" onclick="filterByStatus('production',this)">Production</button>
+        <button class="tab-btn" onclick="filterByStatus('shipped',this)">Shipped</button>
+        <button class="tab-btn" onclick="filterByStatus('delivered',this)">Delivered</button>
+      </div>
+
+      <table class="admin-table" id="ordersTable">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          {% for o in orders %}
+          <tr data-order="{{ o.id }}" data-status="{{ o.status|lower }}">
+            <td><span class="order-ref">{{ o.ref }}</span></td>
+            <td><span class="user-name">{{ o.user_name }}</span><br><span class="user-email">{{ o.user_email }}</span></td>
+            <td>{{ o.brand }} {{ o.car_name }}<br><span style="font-size:0.72rem;color:var(--muted)">{{ o.color }} · {{ o.wheels }}</span></td>
+            <td><span style="color:var(--muted);font-size:0.78rem">{{ o.date }}</span></td>
+            <td>₹{{ o.total_price|inr }}</td>
+            <td><span style="font-size:0.75rem;color:var(--muted)">{{ o.payment }}</span></td>
+            <td><span class="status-badge status-{{ o.status|lower }}">{{ o.status }}</span></td>
+            <td>
+              <div style="display:flex;gap:6px">
+                <select class="status-select" id="ord-{{ o.id }}">{% for st in statuses %}<option value="{{ st|lower }}" {% if st == o.status %}selected{% endif %}>{{ st }}</option>{% endfor %}</select>
+                <button class="update-btn" onclick="updateStatus({{ o.id }}, 'ord-{{ o.id }}', this)">✓</button>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" style="color:var(--muted)">No orders yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== USERS TAB ===== -->
+    <div class="tab-content" id="tab-users">
+      <div class="admin-header">
+        <h1>All <span>Users</span></h1>
+        <p>View all registered customers and admins.</p>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Search by name or email…" oninput="filterUsers(this.value)"/>
+      </div>
+
+      <table class="admin-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Orders</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="color:var(--muted)">{{ '%03d' % u.id }}</td>
+            <td><span class="user-name">{{ u.name }}</span></td>
+            <td><span class="user-email">{{ u.email }}</span></td>
+            <td style="color:var(--muted);font-size:0.78rem">{{ u.phone or '—' }}</td>
+            <td style="color:var(--muted);font-size:0.78rem">{{ u.city or '—' }}</td>
+            <td><span class="role-badge role-{{ u.role }}">{{ u.role|capitalize }}</span></td>
+            <td style="color:var(--muted);font-size:0.78rem">{{ (u.created_at or '')[:10] }}</td>
+            <td style="color:var(--gold);font-weight:600">{% if u.role == 'admin' %}—{% else %}{{ u.order_count }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== CARS TAB ===== -->
+    <div class="tab-content" id="tab-cars">
+      <div class="admin-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1>Manage <span>Cars</span></h1>
+          <p>View, add, and remove cars from the fleet. Changes save directly to the database.</p>
+        </div>
+        <button class="update-btn" onclick="toggleAddCarForm()" id="addCarToggleBtn">+ Add Car</button>
+      </div>
+
+      <!-- Add Car form — hidden until "+ Add Car" is clicked -->
+      <div id="addCarForm" style="display:none; background:var(--panel,#1a1a1a); border:1px solid var(--border,#333); border-radius:8px; padding:1.5rem; margin-bottom:1.5rem;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem;">
+          <input type="text" id="newBrand" placeholder="Brand (e.g. BMW)">
+          <input type="text" id="newName" placeholder="Model (e.g. 7 Series)">
+          <select id="newCategory">
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Sports">Sports</option>
+            <option value="Electric">Electric</option>
+          </select>
+          <input type="number" id="newBhp" placeholder="BHP">
+          <select id="newImage">
+            <option value="">Car image…</option>
+            {% for img in images %}<option value="{{ img }}">{{ img }}</option>{% endfor %}
+          </select>
+          <input type="number" id="newPrice" placeholder="Base Price (₹)">
+        </div>
+        <div style="margin-top:1rem; display:flex; gap:0.7rem;">
+          <button class="update-btn" onclick="submitNewCar()">Save Car</button>
+          <span id="addCarMsg" style="font-size:0.8rem; align-self:center;"></span>
+        </div>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Type</th>
+            <th>BHP</th>
+            <th>Base Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="carsTableBody">
+          <tr><td colspan="7" style="color:var(--muted)">Loading cars…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Navbar
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+  });
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  // ---------- Manage Cars: load, add, delete (real DB calls) ----------
+  function formatINR(num) {
+    return "₹" + Number(num).toLocaleString("en-IN");
+  }
+
+  async function loadCars() {
+    const tbody = document.getElementById('carsTableBody');
+    try {
+      const res = await fetch('/api/cars');
+      const cars = await res.json();
+
+      if (!cars.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--muted)">No cars yet. Click "+ Add Car" to create one.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = cars.map(car => `
+        <tr id="car-row-${car.id}">
+          <td style="color:var(--muted)">${String(car.id).padStart(2,'0')}</td>
+          <td>${car.brand}</td>
+          <td>${car.name}</td>
+          <td><span class="status-badge status-confirmed">${car.category}</span></td>
+          <td>${car.bhp ?? '—'}</td>
+          <td>${formatINR(car.base_price)}</td>
+          <td><button class="update-btn" style="background:#b1483f" onclick="deleteCar(${car.id})">Delete</button></td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="7" style="color:#b1483f">Could not load cars. Is the Flask server running?</td></tr>';
+    }
+  }
+
+  function toggleAddCarForm() {
+    const form = document.getElementById('addCarForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function submitNewCar() {
+    const msg = document.getElementById('addCarMsg');
+    const payload = {
+      brand: document.getElementById('newBrand').value.trim(),
+      name: document.getElementById('newName').value.trim(),
+      category: document.getElementById('newCategory').value,
+      bhp: document.getElementById('newBhp').value || null,
+      image: document.getElementById('newImage').value,
+      base_price: document.getElementById('newPrice').value
+    };
+
+    if (!payload.brand || !payload.name || !payload.base_price) {
+      msg.style.color = '#b1483f';
+      msg.textContent = 'Brand, model and price are required.';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        msg.style.color = '#27AE60';
+        msg.textContent = 'Car added!';
+        document.getElementById('newBrand').value = '';
+        document.getElementById('newName').value = '';
+        document.getElementById('newBhp').value = '';
+        document.getElementById('newPrice').value = '';
+        loadCars();
+      } else {
+        msg.style.color = '#b1483f';
+        msg.textContent = data.message || 'Failed to add car.';
+      }
+    } catch (err) {
+      msg.style.color = '#b1483f';
+      msg.textContent = 'Network error — is the server running?';
+    }
+  }
+
+  async function deleteCar(carId) {
+    if (!confirm('Delete this car permanently?')) return;
+
+    try {
+      const res = await fetch(`/api/cars/${carId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById(`car-row-${carId}`).remove();
+      } else {
+        alert(data.message || 'Failed to delete car.');
+      }
+    } catch (err) {
+      alert('Network error — is the server running?');
+    }
+  }
+
+  // Load cars as soon as the page opens
+  loadCars();
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // Tab switch (also highlights the sidebar link)
+  function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.sidebar-menu a').forEach(a => {
+      a.classList.toggle('active', (a.getAttribute('onclick') || '').includes("'" + name + "'"));
+    });
+  }
+
+  // Update order status -> saved in the database
+  async function updateStatus(orderId, selectId, btn) {
+    const status = document.getElementById(selectId).value;
+    btn.textContent = '…';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/admin/update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId, status })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        showToast('❌ ' + (data.message || 'Could not update'));
+        btn.textContent = '!';
+      } else {
+        // the same order can appear in two tables - update both
+        document.querySelectorAll(`tr[data-order="${orderId}"]`).forEach(row => {
+          const badge = row.querySelector('.status-badge');
+          badge.className = `status-badge status-${status}`;
+          badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+          row.querySelector('.status-select').value = status;
+          if (row.dataset.status) row.dataset.status = status;
+        });
+        showToast(`✅ Order updated to ${status}`);
+        btn.textContent = '✓';
+      }
+    } catch {
+      showToast('❌ Cannot reach the server');
+      btn.textContent = '!';
+    }
+    btn.disabled = false;
+  }
+
+  // Filter orders by status
+  function filterByStatus(status, btn) {
+    document.querySelectorAll('.tab-bar .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('#ordersBody tr').forEach(row => {
+      row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+    });
+  }
+
+  // Search orders
+  function filterOrders() {
+    const q = document.getElementById('orderSearch').value.toLowerCase();
+    document.querySelectorAll('#ordersBody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  // Search users
+  function filterUsers(q) {
+    document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+    });
+  }
+
+  // Toast notification
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+
+</body>
+</html>

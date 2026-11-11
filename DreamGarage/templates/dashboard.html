@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard | DreamGarage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <style>
+    body { padding-top: 70px; }
+
+    .dash-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 70px);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      background: var(--charcoal);
+      border-right: 1px solid var(--border);
+      padding: 40px 0;
+      position: sticky; top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+    }
+
+    .user-card { padding: 0 28px 28px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+    .user-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #8B6914);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
+      font-weight: 600; color: var(--black); margin-bottom: 14px;
+    }
+    .user-name { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+    .user-email { font-size: 0.75rem; color: var(--muted); }
+    .user-badge {
+      display: inline-block; margin-top: 8px;
+      background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold); font-size: 0.65rem; letter-spacing: 2px;
+      text-transform: uppercase; padding: 3px 10px;
+    }
+
+    .sidebar-menu { list-style: none; padding: 0 14px; }
+    .sidebar-menu li { margin-bottom: 2px; }
+    .sidebar-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; text-decoration: none; color: var(--muted);
+      font-size: 0.82rem; letter-spacing: 0.5px; border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .sidebar-menu a:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+    .sidebar-menu a.active { color: var(--gold); background: rgba(201,168,76,0.08); }
+    .sidebar-menu .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .sidebar-divider { height: 1px; background: var(--border); margin: 14px 28px; }
+
+    .sidebar-logout {
+      margin: 14px 14px 0;
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; color: var(--danger);
+      font-size: 0.82rem; cursor: pointer; background: none;
+      border: none; font-family: 'Inter', sans-serif;
+      width: calc(100% - 28px); text-align: left; transition: opacity 0.2s;
+    }
+    .sidebar-logout:hover { opacity: 0.7; }
+
+    /* ===== MAIN CONTENT ===== */
+    .dash-main { background: var(--black); padding: 44px 48px; overflow-y: auto; }
+
+    .dash-greeting { margin-bottom: 36px; }
+    .dash-greeting h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 300; margin-bottom: 4px;
+    }
+    .dash-greeting h1 span { color: var(--gold); }
+    .dash-greeting p { color: var(--muted); font-size: 0.88rem; }
+
+    /* STATS CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+    .stat-card {
+      background: var(--charcoal); border: 1px solid var(--border);
+      padding: 22px 24px;
+    }
+    .stat-card-label { font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .stat-card-value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--white); line-height: 1; }
+    .stat-card-sub   { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+    .stat-card.gold  .stat-card-value { color: var(--gold); }
+
+    /* ORDERS TABLE */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; }
+
+    .orders-table { width: 100%; border-collapse: collapse; }
+    .orders-table thead tr { border-bottom: 1px solid var(--border); }
+    .orders-table th {
+      text-align: left; padding: 10px 16px; font-size: 0.65rem;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+      font-weight: 400;
+    }
+    .orders-table tbody tr {
+      border-bottom: 1px solid #1a1a1a;
+      transition: background 0.15s; cursor: pointer;
+    }
+    .orders-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .orders-table td { padding: 16px; font-size: 0.84rem; vertical-align: middle; }
+
+    .order-id    { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--gold); }
+    .order-model { font-weight: 500; }
+    .order-date  { color: var(--muted); font-size: 0.78rem; }
+    .order-price { font-weight: 600; }
+
+    .status-badge {
+      display: inline-block; padding: 4px 12px; font-size: 0.65rem;
+      letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
+    }
+    .status-pending   { background: rgba(241,196,15,0.15);  color: #F1C40F; }
+    .status-confirmed { background: rgba(52,152,219,0.15);  color: #3498DB; }
+    .status-shipped   { background: rgba(155,89,182,0.15);  color: #9B59B6; }
+    .status-delivered { background: rgba(39,174,96,0.15);   color: #27AE60; }
+
+    /* TRACKING CARD */
+    .tracking-section { margin-top: 36px; }
+    .tracking-card {
+      background: var(--charcoal); border: 1px solid var(--border);
+      padding: 28px 30px;
+    }
+    .tracking-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin-bottom: 22px; }
+    .track-steps { display: flex; gap: 0; }
+    .track-step { flex: 1; text-align: center; position: relative; }
+    .track-step::before {
+      content: ''; position: absolute;
+      top: 16px; left: 50%; right: -50%;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+    .track-step:last-child::before { display: none; }
+    .track-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--border); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px; font-size: 0.85rem; position: relative; z-index: 1;
+      transition: all 0.3s;
+    }
+    .track-step.done .track-icon   { background: var(--gold); border-color: var(--gold); }
+    .track-step.done::before        { background: var(--gold); }
+    .track-step.active .track-icon  { background: var(--charcoal); border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201,168,76,0.2); }
+    .track-label { font-size: 0.7rem; color: var(--muted); }
+    .track-step.done .track-label, .track-step.active .track-label { color: var(--white); }
+
+    /* SAVED CONFIGS */
+    .configs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+    .config-card {
+      background: var(--charcoal); border: 1px solid var(--border);
+      padding: 22px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .config-card-brand { font-size: 0.65rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
+    .config-card-name  { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
+    .config-card-info  { font-size: 0.78rem; color: var(--muted); }
+    .config-card-btns  { display: flex; gap: 10px; margin-top: 4px; }
+    .config-card-btns a {
+      flex: 1; text-align: center; padding: 8px; font-size: 0.72rem;
+      letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-edit    { border: 1px solid var(--border); color: var(--muted); }
+    .btn-edit:hover { border-color: var(--white); color: var(--white); }
+    .btn-order2  { background: var(--gold); color: var(--black); font-weight: 600; }
+    .btn-order2:hover { background: var(--gold-lt); }
+
+    @media (max-width: 900px) {
+      .dash-layout { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; height: auto; flex-direction: row; padding: 20px 0; }
+      .dash-main { padding: 28px 20px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .configs-grid { grid-template-columns: 1fr; }
+      .track-steps { flex-direction: column; gap: 16px; }
+      .track-step::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar" class="scrolled">
+  <a href="/" class="logo">Dream<span>Garage</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/cars">Models</a></li>
+    <li><a href="/customize">Customize</a></li>
+    <li><a href="/dashboard" style="color:var(--white)">My Dashboard</a></li>
+    <li><a href="/logout" class="nav-cta">Sign Out</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="dash-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="user-card">
+      <div class="user-avatar">{{ current_user_name[0]|upper }}</div>
+      <div class="user-name">{{ current_user_name }}</div>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li><a href="#" class="active"><span class="icon">🏠</span>Dashboard</a></li>
+      <li><a href="#orders"><span class="icon">📋</span>My Orders</a></li>
+      <li><a href="#tracking"><span class="icon">📍</span>Track Order</a></li>
+    </ul>
+
+    <div class="sidebar-divider"></div>
+
+
+
+    <div class="sidebar-divider"></div>
+
+    <button class="sidebar-logout" onclick="window.location.href='/logout'">
+      <span class="icon">🚪</span> Sign Out
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+
+    <!-- Greeting -->
+    <div class="dash-greeting fade-up">
+      <h1>Welcome back, <span>{{ current_user_name.split(' ')[0] }}</span> 👋</h1>
+      <p>Here's a summary of your DreamGarage activity.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row fade-up">
+      <div class="stat-card gold">
+        <div class="stat-card-label">Total Orders</div>
+        <div class="stat-card-value">{{ stats.total }}</div>
+        <div class="stat-card-sub">Lifetime orders placed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">In Transit</div>
+        <div class="stat-card-value">{{ stats.in_transit }}</div>
+        <div class="stat-card-sub">Being built or delivered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Delivered</div>
+        <div class="stat-card-value">{{ stats.delivered }}</div>
+        <div class="stat-card-sub">Vehicles received</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Pending</div>
+        <div class="stat-card-value">{{ stats.pending }}</div>
+        <div class="stat-card-sub">Awaiting confirmation</div>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div id="orders">
+      <div class="section-header">
+        <h2>My Orders</h2>
+        <a href="/cars" class="btn-outline" style="padding:9px 20px;font-size:0.75rem;letter-spacing:1.5px">+ New Order</a>
+      </div>
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Vehicle</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+          <tr>
+            <td><span class="order-id">{{ o.ref }}</span></td>
+            <td><span class="order-model">{{ o.brand }} {{ o.car_name }}</span><br><span class="order-date">{{ o.color }} · {{ o.wheels }}</span></td>
+            <td><span class="order-date">{{ o.date }}</span></td>
+            <td><span class="order-price">₹{{ o.total_price|inr }}</span></td>
+            <td><span class="status-badge status-{{ o.status|lower }}">{{ o.status }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="color:var(--muted)">You have no orders yet. <a href="/cars" style="color:var(--gold)">Browse cars</a> and place your first order.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Order Tracking -->
+    <div class="tracking-section" id="tracking">
+      <div class="section-header" style="margin-top:40px">
+        <h2>Track Order</h2>
+      </div>
+      {% set labels = ['Order Placed', 'Confirmed', 'In Production', 'Shipped', 'Delivered'] %}
+      {% set icons = ['📝', '✔', '🏭', '🚚', '🏠'] %}
+      {% for o in orders %}
+      <div class="tracking-card" style="margin-bottom:20px">
+        <h3>{{ o.ref }} — {{ o.brand }} {{ o.car_name }} · <span style="color:var(--gold)">{{ o.status }}</span></h3>
+        <div class="track-steps">
+          {% for label in labels %}
+          {% set is_done = loop.index0 < o.step or o.step == 4 %}
+          <div class="track-step {% if is_done %}done{% elif loop.index0 == o.step %}active{% endif %}">
+            <div class="track-icon">{% if is_done %}✓{% else %}{{ icons[loop.index0] }}{% endif %}</div>
+            <div class="track-label">{{ label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% else %}
+      <div class="tracking-card"><p style="color:var(--muted)">Place an order to see its tracking here.</p></div>
+      {% endfor %}
+    </div>
+
+  </main>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+  });
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  // Sidebar active link
+  document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-menu a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

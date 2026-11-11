@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DreamGarage | Luxury Car Customization</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Rajdhani:wght@300;400;500;600;700&display=swap"/>
+  <style>
+    /* ===== TOKENS ===== */
+    :root {
+      --black:    #0A0A0A;
+      --charcoal: #111111;
+      --panel:    #161616;
+      --border:   #2A2A2A;
+      --gold:     #C9A84C;
+      --gold-lt:  #E2C97E;
+      --white:    #F5F3EE;
+      --muted:    #888880;
+      --danger:   #C0392B;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family:playfair display, serif;
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      margin: 0;
+    
+
+    }
+    /* Background Video */
+.video-bg{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -2;
+}
+.video-bg video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Shift video slightly to the right */
+    object-position: 60% center;
+}
+.video-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.35) 0%, rgba(10,10,10,0.75) 65%, var(--black) 100%);
+    pointer-events: none;
+}
+
+/* Content */
+.content{
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+    margin-top: 250px;
+}
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 60px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+      transition: background 0.3s;
+    }
+    nav.scrolled { background: rgba(10,10,10,0.97); border-bottom: 1px solid var(--border); }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .logo span { color: var(--gold); }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; align-items: center; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted); font-size: 0.82rem;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      background: var(--gold); color: var(--black) !important;
+      padding: 10px 24px; letter-spacing: 1.5px;
+      font-weight: 600; font-size: 0.78rem !important;
+      text-transform: uppercase; transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--gold-lt) !important; color: var(--black) !important; }
+
+
+
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      position: relative;
+      background: transparent;
+      overflow: hidden;
+      padding: 120px 20px 60px;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(135deg, transparent 60%, rgba(201,168,76,0.04) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(201,168,76,0.03) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(201,168,76,0.03) 60px);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: block; width: 40px; height: 1px; background: var(--gold); opacity: 0.5;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      margin-bottom: 28px;
+      max-width: 800px;
+      margin-inline: auto;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); font-weight: 400; }
+
+    .hero-sub {
+      font-size: 0.95rem; color: var(--muted); max-width: 460px;
+      margin: 0 auto 48px; line-height: 1.8; font-weight: 300;
+    }
+
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--gold); color: var(--black); border: 1px solid var(--gold);
+      padding: 15px 40px; font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      text-decoration: none; transition: background 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: var(--gold-lt); transform: translateY(-1px); }
+
+    .btn-outline {
+      border: 1px solid var(--border); color: var(--white);
+      padding: 15px 40px; font-size: 0.8rem; font-weight: 400;
+      letter-spacing: 2px; text-transform: uppercase;
+      text-decoration: none; transition: border-color 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-car-silhouette {
+      margin-top: 70px;
+      width: 100%; max-width: 800px;
+      margin-inline: auto;
+      position: relative;
+    }
+
+    /* SVG car placeholder with glowing underline */
+    .car-svg-wrap {
+      position: relative; display: inline-block; width: 100%;
+    }
+    .car-svg-wrap svg { width: 100%; height: auto; }
+
+    .glow-line {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin-top: 0; opacity: 0.6;
+    }
+
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .scroll-hint .arrow { width: 1px; height: 40px; background: var(--border); position: relative; }
+    .scroll-hint .arrow::after {
+      content: ''; position: absolute; bottom: 0; left: -3px;
+      width: 7px; height: 7px; border-right: 1px solid var(--muted);
+      border-bottom: 1px solid var(--muted); transform: rotate(45deg);
+    }
+
+    /* ===== STATS STRIP ===== */
+    .stats-strip {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: var(--charcoal);
+    }
+    .stat-item {
+      padding: 36px 30px; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem; color: var(--gold); font-weight: 600; line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem; color: var(--muted); letter-spacing: 2px;
+      text-transform: uppercase; margin-top: 8px;
+    }
+
+    /* ===== SECTION SHARED ===== */
+    .section { padding: 100px 60px; }
+    .section-eyebrow {
+      font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400; line-height: 1.15; margin-bottom: 20px;
+    }
+    .section-sub { color: var(--muted); max-width: 480px; font-size: 0.9rem; line-height: 1.8; }
+
+    /* ===== FEATURED CARS ===== */
+    .cars-section { background: var(--charcoal); }
+    .cars-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px; }
+    .view-all { color: var(--gold); font-size: 0.78rem; letter-spacing: 2px; text-decoration: none; text-transform: uppercase; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    .view-all:hover { border-bottom-color: var(--gold); }
+
+    .cars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+
+    .car-card {
+      background: var(--panel); position: relative; overflow: hidden;
+      cursor: pointer; 
+      /* group:true; */
+      transition: transform 0.3s;
+    }
+    .car-card:hover { transform: translateY(-4px); }
+    .car-card:hover .car-card-overlay { opacity: 1; }
+
+    .car-card-img {
+      width: 100%; aspect-ratio: 3/2;
+      display: flex; align-items: center; justify-content: center;
+      background: #1a1a1a; position: relative; overflow: hidden;
+    }
+    .car-card-img img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center;
+      display: block;
+    }
+
+    /* Car SVG illustrations */
+    
+    .car-card:hover .car-card-img svg { transform: scale(1.05); }
+
+    .car-card-body { padding: 28px; }
+    .car-brand { font-size: 0.68rem; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+    .car-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; margin-bottom: 6px; }
+    .car-price { color: var(--muted); font-size: 0.85rem; }
+    .car-price strong { color: var(--white); font-size: 1rem; }
+
+    .car-card-overlay {
+      position: absolute; inset: 0; background: rgba(201,168,76,0.08);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .car-card-overlay a {
+      background: var(--gold); color: var(--black);
+      padding: 12px 30px; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+      transform: translateY(8px); transition: transform 0.3s;
+    }
+    .car-card:hover .car-card-overlay a { transform: translateY(0); }
+
+    /* ===== HOW IT WORKS ===== */
+    .how-section { background: var(--black); }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 60px; }
+    .step {
+      padding: 40px 32px; border-left: 1px solid var(--border); position: relative;
+    }
+    .step:first-child { border-left: none; }
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem; color: var(--border); font-weight: 700;
+      line-height: 1; margin-bottom: 20px;
+    }
+    .step-title { font-size: 1rem; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .step-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .step-icon { font-size: 1.5rem; margin-bottom: 16px; }
+
+    /* ===== CTA BANNER ===== */
+    .cta-banner {
+      background: linear-gradient(135deg, #1a1200 0%, #0d0d0d 60%);
+      border-top: 1px solid var(--border);
+      padding: 100px 60px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .cta-banner h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 300; margin-bottom: 16px;
+    }
+    .cta-banner p { color: var(--muted); margin-bottom: 40px; font-size: 0.95rem; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--charcoal); border-top: 1px solid var(--border);
+      padding: 60px 60px 30px;
+    }
+    .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+    .footer-brand .logo { display: block; margin-bottom: 16px; }
+    .footer-brand p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; max-width: 280px; }
+    .footer-col h4 { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-col ul li a:hover { color: var(--white); }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-bottom p { font-size: 0.75rem; color: var(--muted); }
+
+    /* ===== HAMBURGER MOBILE ===== */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 1px; background: var(--white); transition: all 0.3s; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: var(--charcoal); padding: 20px; gap: 16px; border-bottom: 1px solid var(--border); }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .section { padding: 70px 24px; }
+      .cars-grid, .steps-grid { grid-template-columns: 1fr; }
+      .stats-strip { grid-template-columns: repeat(2, 1fr); }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .cars-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .step { border-left: none; border-bottom: 1px solid var(--border); }
+    }
+
+    @media (max-width: 560px) {
+      .footer-top { grid-template-columns: 1fr; }
+      .stats-strip { grid-template-columns: 1fr; }
+      .hero-btns { flex-direction: column; align-items: center; }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+    .fade-up-2 { animation: fadeUp 0.7s 0.15s ease both; }
+    .fade-up-3 { animation: fadeUp 0.7s 0.3s ease both; }
+    .fade-up-4 { animation: fadeUp 0.7s 0.45s ease both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fade-up, .fade-up-2, .fade-up-3, .fade-up-4 { animation: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="video-bg"><video autoplay muted loop playsinline><source src="/static/bg-video.mp4" type="video/mp4"></video></div><div class="video-overlay"></div>
+
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <a href="/" class="logo">Dream<span>Garage</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/cars">Models</a></li>
+    <li><a href="/customize">Customize</a></li>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="/dashboard">My Orders</a></li>
+    {% if current_user_name %}<li><a href="/logout" class="nav-cta">Sign Out</a></li>{% else %}<li><a href="/login" class="nav-cta">Sign In</a></li>{% endif %}
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div style="position:relative; z-index:1; width:100%;">
+    <div class="hero-eyebrow fade-up">Bespoke Luxury Automotive</div>
+    <h1 class="fade-up-2">
+      Build the car<br><em>you've always imagined</em>
+    </h1>
+    <p class="hero-sub fade-up-3">
+      Configure every detail of your dream machine — exterior finish, interior leather, performance upgrades — then order it directly to your door.
+    </p>
+    <div class="hero-btns fade-up-4">
+      <a href="/cars" class="btn-primary">Explore Models</a>
+      <a href="/customize" class="btn-outline">Start Customizing</a>
+    </div>
+
+  </div>
+  <div class="scroll-hint">
+    <span></span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ===== STATS STRIP ===== -->
+<div class="stats-strip">
+  <div class="stat-item"><div class="stat-num">{{ stats.models }}</div><div class="stat-label">Luxury Models</div></div>
+  <div class="stat-item"><div class="stat-num">{{ stats.brands }}</div><div class="stat-label">Brands</div></div>
+  <div class="stat-item"><div class="stat-num">{{ stats.options }}</div><div class="stat-label">Custom Options</div></div>
+  <div class="stat-item"><div class="stat-num">{{ stats.categories }}</div><div class="stat-label">Car Types</div></div>
+</div>
+
+<!-- ===== FEATURED CARS ===== -->
+<section class="section cars-section">
+  <div class="cars-header">
+    <div>
+      <div class="section-eyebrow">Our Fleet</div>
+      <h2 class="section-title">Featured Models</h2>
+    </div>
+    <a href="/cars" class="view-all">View all models →</a>
+  </div>
+
+  <div class="cars-grid">
+    {% for car in featured %}
+    <div class="car-card">
+      <div class="car-card-img">
+        <img src="{{ url_for('static', filename='images/' ~ car.image) }}" alt="{{ car.brand }} {{ car.name }}">
+      </div>
+      <div class="car-card-body">
+        <div class="car-brand">{{ car.brand }}</div>
+        <div class="car-name">{{ car.name }}</div>
+        <div class="car-price">Starting from <strong>₹{{ car.base_price|inr }}</strong></div>
+      </div>
+      <div class="car-card-overlay"><a href="/customize?car={{ car.id }}">Customize →</a></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section how-section" id="how-it-works">
+  <div class="section-eyebrow">The Process</div>
+  <h2 class="section-title">From vision to driveway</h2>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-icon">🚘</div>
+      <div class="step-num">01</div>
+      <div class="step-title">Choose Your Model</div>
+      <div class="step-desc">Browse our curated fleet of ultra-luxury vehicles. Filter by brand, body type, or price range to find your ideal base.</div>
+    </div>
+    <div class="step">
+      <div class="step-icon">🎨</div>
+      <div class="step-num">02</div>
+      <div class="step-title">Customize Every Detail</div>
+      <div class="step-desc">Pick the colour, wheels, interior and accessories. The price updates live as you choose.</div>
+    </div>
+    <div class="step">
+      <div class="step-icon">📋</div>
+      <div class="step-num">03</div>
+      <div class="step-title">Review & Order</div>
+      <div class="step-desc">Check your configuration with the full price breakdown, enter delivery details and pay by UPI QR code.</div>
+    </div>
+    <div class="step">
+      <div class="step-icon">🏠</div>
+      <div class="step-num">04</div>
+      <div class="step-title">White-Glove Delivery</div>
+      <div class="step-desc">Follow your order status on the dashboard until your car is delivered to your door.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA BANNER ===== -->
+<section class="cta-banner">
+  <h2>Your dream car is waiting</h2>
+  <p>Pick a car, customize it your way and place your order online.</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="/register" class="btn-primary">Create Account</a>
+    <a href="/cars" class="btn-outline">Browse Models</a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="/" class="logo">Dream<span>Garage</span></a>
+      <p>Bespoke luxury automotive — designed by you, delivered with precision. India's premier online car customization platform.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Models</h4>
+      <ul>
+        <li><a href="/cars">All Cars</a></li>
+        {% for t in categories %}<li><a href="/cars?category={{ t|lower }}">{{ t }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <ul>
+        <li><a href="/login">Sign In</a></li>
+        <li><a href="/register">Register</a></li>
+        <li><a href="/dashboard">My Orders</a></li>
+        <li><a href="/dashboard#tracking">Track Order</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/showrooms">Showrooms</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {{ year }} DreamGarage. All rights reserved.</p>
+    <p style="color:var(--border);font-size:0.72rem;">Built with HTML · CSS · JavaScript · Python · SQLite</p>
+  </div>
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // Scroll-reveal for cards
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.car-card, .step, .stat-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
