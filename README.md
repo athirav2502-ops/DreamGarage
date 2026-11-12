@@ -1,98 +1,166 @@
-# 🚘 DreamGarage
-### Luxury Car Customization and Online Ordering System
+<div align="center">
 
-DreamGarage is a web-based luxury car customization and online ordering platform developed using Python Full Stack technologies.
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0B0B0B&height=170&text=DREAMGARAGE&fontSize=58&fontColor=D4AF37&fontAlignY=45" width="100%"/>
 
-The application allows users to explore luxury cars, customize vehicle preferences, add cars to their shopping cart, and place orders through an interactive interface.
+### THE ART OF AUTOMOTIVE PERSONALIZATION
 
-## ✨ Key Features
+Luxury Car Customization & Online Ordering Platform
 
-- 🔐 User Registration and Login
-- 🚗 Luxury Car Collection
-- 🎨 Interactive Car Customization
-- 🛒 Shopping Cart
-- 💳 UPI QR Payment Interface
-- 👤 Customer Dashboard
-- ⚙️ Admin Dashboard
-- 📦 Order Management
-- 📍 Order Status Tracking
-- ⭐ Customer Reviews
+<br/>
 
-## 🛠️ Technologies Used
+<a href="https://dreamgarage-yo23.onrender.com/">
+<img src="https://img.shields.io/badge/EXPLORE%20LIVE%20WEBSITE-D4AF37?style=for-the-badge&logo=googlechrome&logoColor=black"/>
+</a>
 
-| Technology | Purpose |
-|---|---|
-| HTML5 | Web Structure |
-| CSS3 | Styling and Design |
-| JavaScript | Frontend Interactivity |
-| Python | Backend Programming |
-| Flask | Web Framework |
-| SQLite | Database Management |
+<a href="https://github.com/athirav2502-ops/DreamGarage">
+<img src="https://img.shields.io/badge/VIEW%20SOURCE-222222?style=for-the-badge&logo=github&logoColor=white"/>
+</a>
 
-## 📂 Project Structure
+</div>
+
+---
+
+## 01 / INTRODUCTION
+
+**DreamGarage** is a full-stack web application designed to bring luxury automobile exploration and customization into one digital platform.
+
+The application combines an elegant interface with practical shopping and order-management functionality.
+
+Its goal is to make exploring and personalizing luxury vehicles an engaging digital experience.
+
+## 02 / EXPERIENCE THE FEATURES
+
+| FEATURE | DESCRIPTION |
+|:---|:---|
+| 🚘 Car Collection | Explore luxury automobile models |
+| 🎨 Customization | Personalize vehicle preferences |
+| 🛒 Shopping Cart | Manage selected vehicles |
+| 👤 User Account | Registration and login |
+| 📦 Order Management | Manage customer orders |
+| 💳 Payment Interface | UPI QR payment display |
+| ⚙️ Admin Dashboard | Manage cars and orders |
+
+## 03 / TECHNOLOGY
+
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=html,css,js,bootstrap,python,flask,sqlite&theme=dark"/>
+
+</div>
+
+| Layer | Technologies |
+|:---|:---|
+| Frontend | HTML, CSS, JavaScript, Bootstrap |
+| Backend | Python, Flask |
+| Database | SQLite |
+| Deployment | Render |
+| Version Control | Git, GitHub |
+
+## 04 / APPLICATION JOURNEY
+
+<div align="center">
+
+**DISCOVER** → **EXPLORE** → **CUSTOMIZE** → **ADD TO CART** → **ORDER**
+
+</div>
+
+The application provides separate experiences for customers and administrators.
+
+### Customer Experience
+- Browse available luxury cars.
+- View individual vehicle details.
+- Customize vehicle preferences.
+- Add selections to the cart.
+- Place and manage orders.
+
+### Administration
+- Access the admin dashboard.
+- Manage vehicle information.
+- Monitor customer orders.
+
+## 05 / PROJECT MODULES
 
 ```text
-DreamGarage/
+DREAMGARAGE
 │
-├── app.py
-├── requirements.txt
-├── templates/
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── images/
-│
-└── README.md
+├── Home
+├── Car Collection
+├── Car Details
+├── Customization
+├── Shopping Cart
+├── Payment Interface
+├── User Dashboard
+└── Admin Dashboard
 ```
 
-## ⚙️ Installation and Setup
+## 06 / GETTING STARTED
 
-**1. Clone the repository**
+Run the project locally:
+
+**Clone the repository**
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_LINK
+git clone https://github.com/athirav2502-ops/DreamGarage.git
 ```
 
-**2. Navigate to the project folder**
+**Navigate into the project**
 
 ```bash
 cd DreamGarage
 ```
 
-**3. Install dependencies**
+**Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**4. Configure environment variables**
-
-Set the required Flask secret key and admin credentials securely.
-
-**5. Run the application**
+**Run the application**
 
 ```bash
 python app.py
 ```
 
-**6. Open in browser**
+Open your browser:
 
 ```text
-http://127.0.0.1:5000
+http://127.0.0.1:5000/
 ```
 
-## 🎯 Project Objective
+## 07 / LIVE PROJECT
 
-To develop an interactive luxury car platform that combines vehicle exploration, customization, and online ordering in a user-friendly web application.
+<div align="center">
 
-## 👩‍💻 Developer
+### YOUR DREAM CAR EXPERIENCE STARTS HERE.
 
-Developed as a Python Full Stack Development Mini Project.
+<a href="https://dreamgarage-yo23.onrender.com/">
 
-**Domain:** Web Development
+<img src="https://img.shields.io/badge/LAUNCH%20DREAMGARAGE-D4AF37?style=for-the-badge&logo=googlechrome&logoColor=black"/>
 
-**Technologies:** Python, Flask, HTML, CSS, JavaScript and SQLite.
+</a>
 
----
+</div>
 
-⭐ Thank you for visiting DreamGarage!
+## 08 / DEVELOPER
+
+<div align="center">
+
+### ATHIRA V
+
+Computer Science Student  
+Python Full Stack Developer
+
+<a href="https://github.com/athirav2502-ops">
+<img src="https://img.shields.io/badge/GitHub-ATHIRA-181717?style=for-the-badge&logo=github"/>
+</a>
+
+<br/><br/>
+
+*Designed to explore. Built to personalize.*
+
+### DREAMGARAGE
+**WHERE LUXURY MEETS PERSONALIZATION.**
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0B0B0B,100:D4AF37&height=100&section=footer" width="100%"/>
+
+</div>
